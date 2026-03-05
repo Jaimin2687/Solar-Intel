@@ -28,11 +28,11 @@ export const metadata: Metadata = {
   title: "Solar Intel — AI-Driven Inverter Intelligence",
   description:
     "Enterprise platform for AI-driven solar inverter failure prediction, fleet monitoring, and predictive maintenance intelligence.",
-  icons: {
-    icon: "/icon.svg",
-    shortcut: "/icon.svg",
-    apple: "/icon.svg",
-  },
+  icons: [
+    { rel: "icon", url: "/icon.svg", type: "image/svg+xml" },
+    { rel: "shortcut icon", url: "/icon.svg", type: "image/svg+xml" },
+    { rel: "apple-touch-icon", url: "/icon.svg" },
+  ],
 };
 
 export default function RootLayout({

@@ -220,3 +220,66 @@
   color: hsl(240 4% 70%) !important;
 }
 
+/* ─────────────────────────────────────────────────────────
+ * Tremor BarChart — force bar fill colors in dark mode
+ * Tremor maps color names to Tailwind CSS vars which are
+ * near-transparent on dark backgrounds. Override explicitly.
+ * ───────────────────────────────────────────────────────── */
+
+/* emerald bars */
+.dark .recharts-bar-rectangle path[fill*="emerald"],
+.dark .recharts-rectangle[fill*="emerald"] {
+  fill: #10b981 !important;
+}
+/* violet / purple bars */
+.dark .recharts-bar-rectangle path[fill*="violet"],
+.dark .recharts-rectangle[fill*="violet"] {
+  fill: #8b5cf6 !important;
+}
+/* slate bars */
+.dark .recharts-bar-rectangle path[fill*="slate"],
+.dark .recharts-rectangle[fill*="slate"] {
+  fill: #64748b !important;
+}
+/* zinc bars */
+.dark .recharts-bar-rectangle path[fill*="zinc"],
+.dark .recharts-rectangle[fill*="zinc"] {
+  fill: #71717a !important;
+}
+/* rose bars */
+.dark .recharts-bar-rectangle path[fill*="rose"],
+.dark .recharts-rectangle[fill*="rose"] {
+  fill: #f43f5e !important;
+}
+/* amber / yellow bars */
+.dark .recharts-bar-rectangle path[fill*="amber"],
+.dark .recharts-rectangle[fill*="amber"] {
+  fill: #f59e0b !important;
+}
+/* blue bars */
+.dark .recharts-bar-rectangle path[fill*="blue"],
+.dark .recharts-rectangle[fill*="blue"] {
+  fill: #3b82f6 !important;
+}
+/* cyan bars */
+.dark .recharts-bar-rectangle path[fill*="cyan"],
+.dark .recharts-rectangle[fill*="cyan"] {
+  fill: #06b6d4 !important;
+}
+
+/* Tremor uses CSS custom properties for bar colors — override those too */
+.dark [class*="tremor"] .recharts-bar-rectangle path {
+  opacity: 1 !important;
+}
+
+/* Force Tremor color fill via fill attribute patterns */
+.dark .recharts-bar-rectangle path[fill="var(--tremor-brand)"] { fill: #3b82f6 !important; }
+.dark .recharts-bar-rectangle path[name="This Year"] { fill: #10b981 !important; }
+.dark .recharts-bar-rectangle path[name="Last Year"] { fill: #64748b !important; }
+.dark .recharts-bar-rectangle path[name="Target"]    { fill: #8b5cf6 !important; }
+.dark .recharts-bar-rectangle path[name="CO₂ Avoided (kg)"] { fill: #10b981 !important; }
+.dark .recharts-bar-rectangle path[name="Last Year (kg)"]   { fill: #71717a !important; }
+.dark .recharts-bar-rectangle path[name="Confidence"]       { fill: #8b5cf6 !important; }
+.dark .recharts-bar-rectangle path[name="Imported"]         { fill: #f43f5e !important; }
+.dark .recharts-bar-rectangle path[name="Exported"]         { fill: #10b981 !important; }
+
