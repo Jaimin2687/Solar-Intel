@@ -9,7 +9,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { fadeUp, pageTransition } from "@/lib/motion";
-import { fetchUserProfile } from "@/lib/mock-data";
+import { fetchUserProfile } from "@/lib/api-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -72,8 +72,9 @@ export default function SettingsPage() {
     );
   }
 
-  const onlineDevices = profile.devices.filter((d) => d.status === "online").length;
-  const offlineDevices = profile.devices.filter((d) => d.status === "offline").length;
+  const devices = profile.devices ?? [];
+  const onlineDevices = devices.filter((d) => d.status === "online").length;
+  const offlineDevices = devices.filter((d) => d.status === "offline").length;
 
   const notifSettings = [
     { key: "email", label: "Email Notifications", icon: Mail, enabled: profile.notifications.email },
@@ -265,7 +266,7 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {profile.devices.map((device) => (
+                {devices.map((device) => (
                   <div
                     key={device.id}
                     className={cn(

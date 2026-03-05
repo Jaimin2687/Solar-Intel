@@ -14,7 +14,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { pageTransition, staggerContainer, fadeUp } from "@/lib/motion";
-import { fetchAnalytics } from "@/lib/mock-data";
+import { fetchAnalytics } from "@/lib/api-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";

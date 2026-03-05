@@ -19,6 +19,10 @@ export const env = {
   ML_SERVICE_URL: process.env.ML_SERVICE_URL || "http://ml-service:8000/predict",
   ML_TIMEOUT_MS: parseInt(process.env.ML_TIMEOUT_MS || "10000", 10),
 
+  // Groq AI (LLM for AI Advisor)
+  GROQ_API_KEY: process.env.GROQ_API_KEY || "",
+  GROQ_MODEL: process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
+
   // Email (Gmail SMTP)
   EMAIL_FROM: process.env.EMAIL_FROM || "noreply.garuda@gmail.com",
   EMAIL_APP_PASSWORD: process.env.EMAIL_APP_PASSWORD || "",

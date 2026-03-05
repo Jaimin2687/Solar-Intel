@@ -21,7 +21,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { staggerContainer, fadeUp } from "@/lib/motion";
-import { fetchDashboardData } from "@/lib/mock-data";
+import { fetchDashboardData } from "@/lib/api-client";
 
 // Sub-components
 import { RiskOverview } from "./dashboard/risk-overview";

@@ -26,6 +26,14 @@ export interface IUser extends Document {
     weeklyReport: boolean;
     maintenanceReminders: boolean;
   };
+  devices: Array<{
+    id: string;
+    name: string;
+    type: "inverter" | "meter" | "battery" | "sensor";
+    status: "online" | "offline";
+    lastSeen: string;
+    firmware: string;
+  }>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -56,6 +64,19 @@ const UserSchema = new Schema<IUser>(
       criticalAlerts: { type: Boolean, default: true },
       weeklyReport: { type: Boolean, default: true },
       maintenanceReminders: { type: Boolean, default: true },
+    },
+    devices: {
+      type: [
+        {
+          id: { type: String },
+          name: { type: String },
+          type: { type: String, enum: ["inverter", "meter", "battery", "sensor"] },
+          status: { type: String, enum: ["online", "offline"], default: "online" },
+          lastSeen: { type: String },
+          firmware: { type: String },
+        },
+      ],
+      default: [],
     },
   },
   { timestamps: true }
