@@ -9,8 +9,10 @@ export const env = {
   // Database
   MONGODB_URI: process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/solar-intel",
 
-  // Auth
-  NEXTAUTH_URL: process.env.NEXTAUTH_URL || "http://localhost:3000",
+  // Auth — VERCEL_URL is auto-set by Vercel on every deployment
+  NEXTAUTH_URL:
+    process.env.NEXTAUTH_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"),
   NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || "",
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "",
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || "",

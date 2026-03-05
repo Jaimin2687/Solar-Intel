@@ -1,9 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Suppress Mongoose/Winston warnings in Next.js server components
-  experimental: {
-    serverComponentsExternalPackages: ["mongoose", "winston"],
-  },
+  serverExternalPackages: ["mongoose", "winston"],
   // Security headers
   async headers() {
     return [
