@@ -10,6 +10,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-green?logo=mongodb)](https://mongooseatlas.com)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38bdf8?logo=tailwindcss)](https://tailwindcss.com)
+[![Groq](https://img.shields.io/badge/Groq-Llama_3.3_70B-f55036?logo=groq)](https://groq.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
 </div>
@@ -30,7 +31,7 @@ This project was created as a submission for **HackaMined** — a hackathon focu
 
 **Key hackathon pillars addressed:**
 - 🔍 **Data Mining** — Continuous telemetry ingestion and pattern analysis
-- 🤖 **AI Integration** — GPT-powered anomaly classification and maintenance prioritization
+- 🤖 **AI Integration** — Groq (Llama 3.3 70B) powered anomaly classification and maintenance prioritization
 - 🌍 **Global Accessibility** — 15-language real-time translation across every page
 - ♻️ **Sustainability** — Carbon offset tracking and grid synchronization quality metrics
 
@@ -51,10 +52,12 @@ This project was created as a submission for **HackaMined** — a hackathon focu
 - Exportable time-series data views
 
 ### 🤖 AI Insights
-- GPT-4 powered health summaries per inverter
-- Natural language failure reasoning
-- Prioritized maintenance recommendations
+- **Groq (Llama 3.3 70B)** powered health summaries per inverter
+- Natural language failure reasoning referencing real telemetry values
+- Prioritized maintenance recommendations auto-generated from live data
 - Confidence scores and risk classifications (critical / high / medium / low)
+- 5-minute server-side cache — no redundant API calls
+- Rule-based fallback engine when Groq is unavailable
 
 ### ⚡ Anomaly Detection
 - Real-time parameter deviation monitoring
@@ -125,7 +128,7 @@ Every page — including **dynamic AI-generated content** — translates in real
 | **Database** | MongoDB via Mongoose |
 | **Auth** | NextAuth.js v4 |
 | **Email** | Nodemailer |
-| **AI** | OpenAI GPT-4 (ai-advisor service) |
+| **AI** | Groq — Llama 3.3 70B via `groq.com` API |
 | **Logging** | Winston |
 | **Rate Limiting** | express-rate-limit |
 | **HTTP Client** | Axios + fetch |
@@ -149,7 +152,7 @@ solar-intel/
 │   │   ├── security/               # Grid security & sync
 │   │   ├── settings/               # User settings
 │   │   └── api/                    # API route handlers
-│   │       ├── ai-advisor/         # GPT-4 health summaries
+│   │       ├── ai-advisor/         # Groq Llama 3.3 70B health summaries
 │   │       ├── analytics/          # Analytics aggregation
 │   │       ├── auth/               # NextAuth endpoints
 │   │       ├── dashboard/          # Dashboard metrics
@@ -252,17 +255,21 @@ EMAIL_SERVER_USER=your@gmail.com
 EMAIL_SERVER_PASSWORD=your_app_password
 EMAIL_FROM=Solar Intel <your@gmail.com>
 
-# ── OpenAI (AI Insights) ───────────────────────────────────
-OPENAI_API_KEY=sk-...
+# ── Groq AI (LLM — AI Insights) ───────────────────────────
+GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL=llama-3.3-70b-versatile
 
-# ── Weather API ────────────────────────────────────────────
-OPENWEATHER_API_KEY=your_openweather_key
+# ── Email (Nodemailer) ─────────────────────────────────────
+EMAIL_FROM=your@gmail.com
+EMAIL_APP_PASSWORD=your_gmail_app_password
 
-# ── Translation (optional — free endpoint is used if omitted/disabled) ──
+# ── Translation (optional — free endpoint used if omitted) ──
 GOOGLE_TRANSLATE_API_KEY=your_google_translate_key
 ```
 
-> **Note on Translation:** The app uses the free `translate.googleapis.com` endpoint by default — no API key or billing required. The `GOOGLE_TRANSLATE_API_KEY` is only used as a primary tier if the Cloud Translation API is enabled in your Google Cloud project; the free endpoint is always the fallback.
+> **Note on Groq:** Get a free API key at [console.groq.com](https://console.groq.com/keys) — no billing required. The app gracefully falls back to rule-based analysis if the key is absent.
+
+> **Note on Translation:** The app uses the free `translate.googleapis.com` endpoint by default — no API key or billing required.
 
 ### 4. Seed the Database
 
@@ -328,7 +335,7 @@ UI re-renders with translated text
 | `/api/inverters` | GET / POST / PUT / DELETE | Inverter CRUD |
 | `/api/telemetry` | GET / POST | Telemetry data |
 | `/api/analytics` | GET | Analytics aggregation |
-| `/api/ai-advisor` | GET | GPT-4 health summaries |
+| `/api/ai-advisor` | GET | Groq Llama 3.3 70B health summaries |
 | `/api/live-energy` | GET | Real-time energy readings |
 | `/api/weather` | GET | Current weather data |
 | `/api/grid` | GET | Grid synchronization metrics |
@@ -347,7 +354,7 @@ UI re-renders with translated text
 |------|-------|-------------|
 | Dashboard | `/` | Live fleet overview, risk scores, trend charts |
 | Analytics | `/analytics` | Detailed energy analytics per inverter |
-| AI Insights | `/ai-insights` | GPT-4 health summaries and recommendations |
+| AI Insights | `/ai-insights` | Groq Llama 3.3 70B health summaries and recommendations |
 | Anomalies | `/anomalies` | Real-time deviation alerts and anomaly log |
 | Forecast | `/forecast` | 48-hour weather-aware generation forecast |
 | Carbon | `/carbon` | CO₂ avoidance and carbon offset tracking |
