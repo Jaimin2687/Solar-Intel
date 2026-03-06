@@ -2,12 +2,14 @@
 
 /**
  * AppShell — wraps app layout with instant session awareness.
+ * Unauthenticated users are redirected to /auth/signin.
  * Shows a branded loading screen only during the initial
  * session fetch (~200ms), then reveals the full UI.
- * Navigating between pages never triggers this screen again.
  */
 
 import { useSession } from "next-auth/react";
+import { useRouter, usePathname } from "next/navigation";
+import { useEffect } from "react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { Sun } from "lucide-react";
@@ -15,9 +17,18 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { status } = useSession();
+  const router = useRouter();
+  const pathname = usePathname();
 
-  // "loading" only fires ONCE on first paint — after that status is
-  // "authenticated" or "unauthenticated" and is stored in memory.
+  const isAuthPage = pathname?.startsWith("/auth");
+
+  useEffect(() => {
+    if (status === "unauthenticated" && !isAuthPage) {
+      router.replace("/auth/signin");
+    }
+  }, [status, isAuthPage, router]);
+
+  // Show loading spinner while session is being fetched
   if (status === "loading") {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0a0a0f]">
@@ -27,7 +38,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           transition={{ duration: 0.3 }}
           className="flex flex-col items-center gap-4"
         >
-          {/* Logo pulse */}
           <motion.div
             animate={{ scale: [1, 1.08, 1] }}
             transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
@@ -35,13 +45,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           >
             <Sun className="h-8 w-8 text-white" />
           </motion.div>
-
-          {/* Brand name */}
           <p className="text-sm font-semibold tracking-widest text-white/40 uppercase">
             Solar Intel
           </p>
-
-          {/* Thin progress bar */}
           <div className="h-0.5 w-32 overflow-hidden rounded-full bg-white/10">
             <motion.div
               className="h-full bg-gradient-to-r from-amber-500 to-orange-500"
@@ -52,6 +58,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </motion.div>
       </div>
     );
+  }
+
+  // Render the auth page without sidebar/header
+  if (isAuthPage) {
+    return <>{children}</>;
+  }
+
+  // Unauthenticated — blank while redirect fires
+  if (status === "unauthenticated") {
+    return null;
   }
 
   return (
