@@ -8,6 +8,8 @@ export { getAnalyticsData } from "./analytics.service";
 export { getLiveEnergyData } from "./live-energy.service";
 export { getGridData } from "./grid.service";
 export { getAIAdvisorData } from "./ai-advisor.service";
+export { getMLPredictions, getMLPredictionSingle } from "./ml-prediction.service";
+export type { MLPrediction } from "./ml-prediction.service";
 export { analyzeInverter } from "./analysis.service";
 export { getUserProfile, updateUserProfile } from "./user.service";
 export {

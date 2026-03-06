@@ -8,6 +8,7 @@
 import { connectDB } from "@/backend/config";
 import { Inverter as InverterModel, TelemetryRecord } from "@/backend/models";
 import { mapToFrontend } from "./inverter.service";
+import { getMLPredictions } from "./ml-prediction.service";
 import logger from "@/backend/utils/logger";
 import type { DashboardData, SystemHealth, PerformanceTrend, AIInsight } from "@/types";
 
@@ -87,33 +88,70 @@ export async function getDashboardData(): Promise<DashboardData> {
     });
   }
 
-  // ── AI Insights for critical/warning ──
-  const aiInsights: AIInsight[] = inverters
-    .filter((i) => i.status === "critical" || i.status === "warning")
-    .map((inv) => ({
-      id: `insight-${inv.id}`,
-      inverterId: inv.id,
-      inverterName: inv.name,
-      riskLevel: inv.status === "critical" ? ("critical" as const) : ("high" as const),
-      summary:
-        inv.status === "critical"
-          ? `Critical performance degradation — ${inv.performanceRatio}% PR with risk score ${inv.riskScore}.`
-          : `Warning: performance ratio at ${inv.performanceRatio}% — monitoring for further decline.`,
-      reasoning: `Temperature: ${inv.temperature}°C, Efficiency: ${inv.efficiency}%, Power: ${inv.powerOutput}kW / ${inv.capacity}kW capacity.`,
-      recommendations: [
-        inv.temperature > 65
-          ? "Reduce load immediately and inspect cooling system."
-          : "Monitor temperature trend over next 48 hours.",
-        inv.efficiency < 85
-          ? "Schedule efficiency diagnostic and MPPT recalibration."
-          : "Efficiency within acceptable range.",
-        `Current risk score: ${inv.riskScore}/100.`,
-      ],
-      confidence: inv.status === "critical" ? 0.92 : 0.78,
-      generatedAt: new Date().toISOString(),
-    }));
+  // ── AI Insights (ML-powered when available) ──
+  const mlPredictions = await getMLPredictions(dbInverters);
 
-  logger.info("Dashboard data assembled", { inverters: inverters.length, trends: performanceTrends.length });
+  let aiInsights: AIInsight[];
+  if (mlPredictions && mlPredictions.length > 0) {
+    // ML model provides risk scores — use them for insights
+    aiInsights = mlPredictions
+      .filter((p) => p.risk_score > 0.25) // Only non-trivial risks
+      .map((p) => {
+        const inv = inverters.find((i) => i.id === p.inverter_id);
+        return {
+          id: `insight-${p.inverter_id}`,
+          inverterId: p.inverter_id,
+          inverterName: inv?.name || p.inverter_id,
+          riskLevel: p.risk_level as "critical" | "high" | "medium" | "low",
+          summary: p.failure_predicted
+            ? `ML model predicts ${Math.round(p.risk_score * 100)}% failure probability — ${p.status}`
+            : `Risk assessment: ${Math.round(p.risk_score * 100)}% — ${p.status}`,
+          reasoning: `Top contributing factors: ${p.top_factors.join(". ")}`,
+          recommendations: [
+            p.recommended_action,
+            ...(inv && inv.temperature > 60 ? ["Inspect cooling system — elevated temperature detected."] : []),
+            ...(inv && inv.efficiency < 85 ? ["Schedule MPPT recalibration."] : []),
+          ],
+          confidence: p.risk_score,
+          generatedAt: new Date().toISOString(),
+        };
+      });
+
+    // Update predictedFailures count with ML data
+    systemHealth.predictedFailures = mlPredictions.filter((p) => p.failure_predicted).length;
+  } else {
+    // Fallback: rule-based insights
+    aiInsights = inverters
+      .filter((i) => i.status === "critical" || i.status === "warning")
+      .map((inv) => ({
+        id: `insight-${inv.id}`,
+        inverterId: inv.id,
+        inverterName: inv.name,
+        riskLevel: inv.status === "critical" ? ("critical" as const) : ("high" as const),
+        summary:
+          inv.status === "critical"
+            ? `Critical performance degradation — ${inv.performanceRatio}% PR with risk score ${inv.riskScore}.`
+            : `Warning: performance ratio at ${inv.performanceRatio}% — monitoring for further decline.`,
+        reasoning: `Temperature: ${inv.temperature}°C, Efficiency: ${inv.efficiency}%, Power: ${inv.powerOutput}kW / ${inv.capacity}kW capacity.`,
+        recommendations: [
+          inv.temperature > 65
+            ? "Reduce load immediately and inspect cooling system."
+            : "Monitor temperature trend over next 48 hours.",
+          inv.efficiency < 85
+            ? "Schedule efficiency diagnostic and MPPT recalibration."
+            : "Efficiency within acceptable range.",
+          `Current risk score: ${inv.riskScore}/100.`,
+        ],
+        confidence: inv.status === "critical" ? 0.92 : 0.78,
+        generatedAt: new Date().toISOString(),
+      }));
+  }
+
+  logger.info("Dashboard data assembled", {
+    inverters: inverters.length,
+    trends: performanceTrends.length,
+    insightSource: mlPredictions ? "ml-model" : "rule-based",
+  });
 
   return { systemHealth, inverters, performanceTrends, aiInsights };
 }

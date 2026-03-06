@@ -258,6 +258,25 @@ export interface RiskTimelinePoint {
 }
 
 /* ── Settings / Profile ── */
+
+/* ── ML Predictions ── */
+export interface MLPrediction {
+  inverter_id: string;
+  plant_id: string;
+  risk_score: number; // 0-1 probability
+  risk_level: RiskLevel;
+  failure_predicted: boolean;
+  status: string;
+  top_factors: string[];
+  recommended_action: string;
+}
+
+export interface MLPredictionResponse {
+  predictions: MLPrediction[];
+  timestamp: string;
+  model_version: string;
+}
+
 export interface UserProfile {
   name: string;
   email: string;

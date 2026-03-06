@@ -19,6 +19,7 @@ import type {
   GridData,
   UserProfile,
   Inverter,
+  MLPredictionResponse,
 } from "@/types";
 
 const BASE = process.env.NEXT_PUBLIC_APP_URL ?? "";
@@ -77,4 +78,27 @@ export async function fetchUserProfile(): Promise<UserProfile> {
     const { fetchUserProfile: mockProfile } = await import("@/lib/mock-data");
     return mockProfile();
   }
+}
+
+/* ── ML Predictions ────────────────────────────────────── */
+export async function fetchMLPredictions(): Promise<MLPredictionResponse> {
+  return apiFetch<MLPredictionResponse>("/api/predict");
+}
+
+export async function fetchMLPredictionSingle(inverterData: Record<string, number | string>): Promise<{
+  risk_score: number;
+  risk_level: string;
+  failure_predicted: boolean;
+  top_factors: string[];
+  recommended_action: string;
+}> {
+  const res = await fetch(`${BASE}/api/predict`, {
+    method: "POST",
+    cache: "no-store",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(inverterData),
+  });
+  if (!res.ok) throw new Error(`ML predict failed: ${res.status}`);
+  const json = await res.json();
+  return (json.data ?? json);
 }
