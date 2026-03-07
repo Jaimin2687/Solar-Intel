@@ -1,404 +1,806 @@
-<div align="center"><div align="center">
+<div align="center"><div align="center"><div align="center">
 
 
 
-# ☀️ Solar Intel# ☀️ Solar Intel
+# ☀️ Solar Intel
 
 
 
-### AI-Powered Solar Plant Monitoring & Predictive Maintenance Platform### AI-Powered Solar Plant Monitoring & Predictive Maintenance Platform
+### AI-Powered Solar Plant Monitoring & Predictive Maintenance Platform# ☀️ Solar Intel# ☀️ Solar Intel
 
 
 
-**Built for HACKaMINeD 2026****Built for HACKaMINeD 2026**
+**Built for HACKaMINeD 2026**
 
 
 
-[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org)[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org)### AI-Powered Solar Plant Monitoring & Predictive Maintenance Platform### AI-Powered Solar Plant Monitoring & Predictive Maintenance Platform
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org)
+
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green?logo=mongodb)](https://mongodb.com)
+
+[![FastAPI](https://img.shields.io/badge/FastAPI-ML_Service-009688?logo=fastapi)](https://fastapi.tiangolo.com)
+
+[![XGBoost](https://img.shields.io/badge/XGBoost-ML_Model-orange)](https://xgboost.readthedocs.io)**Built for HACKaMINeD 2026****Built for HACKaMINeD 2026**
+
+[![SHAP](https://img.shields.io/badge/SHAP-Explainability-purple)](https://shap.readthedocs.io)
+
+[![Groq](https://img.shields.io/badge/Groq-Llama_3.3_70B-f55036)](https://groq.com)
+
+[![Tests](https://img.shields.io/badge/Tests-20_passing-brightgreen)](.)
+
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](.)[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org)[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org)[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org)
 
+[🚀 **Live Demo**](https://solar-intel-six.vercel.app) • [📖 **Documentation**](./docs/)
+
 [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green?logo=mongodb)](https://mongodb.com)[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green?logo=mongodb)](https://mongodb.com)
+
+</div>
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-ML_Service-009688?logo=fastapi)](https://fastapi.tiangolo.com)[![FastAPI](https://img.shields.io/badge/FastAPI-ML_Service-009688?logo=fastapi)](https://fastapi.tiangolo.com)
 
+---
+
 [![XGBoost](https://img.shields.io/badge/XGBoost-ML_Model-orange)](https://xgboost.readthedocs.io)[![Groq](https://img.shields.io/badge/Groq-Llama_3.3_70B-f55036)](https://groq.com)
+
+## 🌟 What is Solar Intel?
 
 [![SHAP](https://img.shields.io/badge/SHAP-Explainability-purple)](https://shap.readthedocs.io)[![Tests](https://img.shields.io/badge/Tests-20_passing-brightgreen)](.)
 
+Solar Intel is a **full-stack intelligent solar plant management platform** that provides complete visibility into multi-plant solar operations. It combines **XGBoost ML-powered predictive maintenance** (95.3% accuracy), **SHAP explainability**, **RAG-grounded conversational AI**, **agentic autonomous workflows**, and **15-language internationalization** — all backed by real MongoDB data and a dedicated FastAPI ML microservice.
+
 [![Groq](https://img.shields.io/badge/Groq-Llama_3.3_70B-f55036)](https://groq.com)[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](.)
+
+> **It doesn't just show data — it predicts failures before they happen, explains why with SHAP feature contributions, and auto-generates maintenance tickets.**
 
 [![Tests](https://img.shields.io/badge/Tests-20_passing-brightgreen)](.)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
+---
+
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](.)
+
+## 🏆 Built for HACKaMINeD 2026
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)**[Live Demo →](https://solar-intel-six.vercel.app)**
 
-
-
-**[🚀 Live Demo →](https://solar-intel-six.vercel.app)** | **[📖 Documentation](./docs/)**</div>
-
-
-
-</div>---
-
-
-
----## 🌟 What is Solar Intel?
-
-
-
-## 🌟 What is Solar Intel?Solar Intel is a **full-stack intelligent solar plant management platform** that provides complete visibility into multi-plant solar operations. It combines **ML-powered predictive maintenance** (95.3% accuracy), **RAG-grounded conversational AI**, **agentic autonomous workflows**, and **15-language internationalization** — all backed by real MongoDB data and a dedicated FastAPI ML microservice.
-
-
-
-Solar Intel is a **full-stack intelligent solar plant management platform** that provides complete visibility into multi-plant solar operations. It combines **XGBoost ML-powered predictive maintenance** (95.3% accuracy), **SHAP explainability**, **RAG-grounded conversational AI**, **agentic autonomous workflows**, and **15-language internationalization** — all backed by real MongoDB data and a dedicated FastAPI ML microservice.**It doesn't just show data — it predicts failures before they happen, explains why in plain English, and auto-generates maintenance tickets.**
-
-
-
-**It doesn't just show data — it predicts failures before they happen, explains why with SHAP feature contributions, and auto-generates maintenance tickets.**---
-
-
-
----## 🏆 Built for HACKaMINeD 2026
-
-
-
-## 🏆 Built for HACKaMINeD 2026| Hackathon Pillar | How We Address It |
+| Hackathon Pillar | How We Address It |
 
 |-----------------|-------------------|
 
-| Hackathon Pillar | How We Address It || 🔍 **Data Mining** | Real solar plant telemetry ingestion from CSV/Excel, 51-feature ML pipeline |
+| 🔍 **Data Mining** | Real solar plant telemetry ingestion from CSV/Excel, 29-feature ML pipeline with lag/rolling features |
 
-|-----------------|-------------------|| 🤖 **GenAI** | Groq Llama 3.3 70B generates operational narratives from ML predictions |
+| 🤖 **GenAI** | Groq Llama 3.3 70B generates operational narratives from ML predictions |**[🚀 Live Demo →](https://solar-intel-six.vercel.app)** | **[📖 Documentation](./docs/)**</div>
 
-| 🔍 **Data Mining** | Real solar plant telemetry ingestion from CSV/Excel, 29-feature ML pipeline with lag/rolling features || 🧠 **RAG Pipeline** | Entity extraction → MongoDB context retrieval → grounded LLM Q&A with sources |
+| 🧠 **RAG Pipeline** | Entity extraction → MongoDB context retrieval → grounded LLM Q&A with source citations |
 
-| 🤖 **GenAI** | Groq Llama 3.3 70B generates operational narratives from ML predictions || 🤖 **Agentic AI** | 4-step autonomous workflow: Data → Risk Assessment → Ticket Drafting → Summary |
+| 🤖 **Agentic AI** | 4-step autonomous workflow: Data → Risk Assessment → Ticket Drafting → Summary |
 
-| 🧠 **RAG Pipeline** | Entity extraction → MongoDB context retrieval → grounded LLM Q&A with source citations || 📊 **ML Model** | HistGradientBoosting classifier, SHAP explanations, FastAPI microservice |
+| 📊 **ML Model** | XGBoost classifier with SHAP TreeExplainer for interpretable predictions |
 
-| 🤖 **Agentic AI** | 4-step autonomous workflow: Data → Risk Assessment → Ticket Drafting → Summary || 🌍 **Global Accessibility** | 15-language real-time translation across every page |
+| 🔬 **Explainability** | Top-5 SHAP feature contributions per prediction with impact percentages |</div>---
 
-| 📊 **ML Model** | XGBoost classifier with SHAP TreeExplainer for interpretable predictions || 🐳 **Production Ready** | Docker multi-container deployment, 20 unit tests, comprehensive docs |
-
-| 🔬 **Explainability** | Top-5 SHAP feature contributions per prediction with impact percentages |
-
-| 🌍 **Global Accessibility** | 15-language real-time translation across every page |---
+| 🌍 **Global Accessibility** | 15-language real-time translation across every page |
 
 | 🐳 **Production Ready** | Docker multi-container deployment, Vercel + Render hosting, comprehensive docs |
 
+
+
+------## 🌟 What is Solar Intel?
+
+
+
 ## ✨ Core Features
 
----
 
-### 🏭 Plant-Based Architecture
 
-## ✨ Core Features- **Multi-plant management** — 3 solar plants, each with dedicated inverter fleets
-
-- **Plant overview** — aggregated metrics per plant (total power, health score, risk level)
-
-### 🏭 Plant-Based Architecture- **Drill-down** — click any plant to see its inverter fleet
+### 🏭 Plant-Based Architecture## 🌟 What is Solar Intel?Solar Intel is a **full-stack intelligent solar plant management platform** that provides complete visibility into multi-plant solar operations. It combines **ML-powered predictive maintenance** (95.3% accuracy), **RAG-grounded conversational AI**, **agentic autonomous workflows**, and **15-language internationalization** — all backed by real MongoDB data and a dedicated FastAPI ML microservice.
 
 - **Multi-plant management** — 3 solar plants across India (Rajasthan, Gujarat, Karnataka)
 
-- **29 inverters** — Fleet of utility-scale inverters with real-time monitoring### 📥 CSV/Excel Data Import
+- **29 inverters** — Fleet of utility-scale inverters with real-time monitoring
 
-- **Plant overview** — aggregated metrics per plant (total power, health score, risk level)- **Drag-and-drop** file upload for plant and inverter data
+- **Plant overview** — aggregated metrics per plant (total power, health score, risk level)
 
-- **Drill-down** — click any plant to see its inverter fleet with real-time status- **Auto-detection** — system identifies whether file contains plant or inverter data
+- **Drill-down** — click any plant to see its inverter fleet with real-time statusSolar Intel is a **full-stack intelligent solar plant management platform** that provides complete visibility into multi-plant solar operations. It combines **XGBoost ML-powered predictive maintenance** (95.3% accuracy), **SHAP explainability**, **RAG-grounded conversational AI**, **agentic autonomous workflows**, and **15-language internationalization** — all backed by real MongoDB data and a dedicated FastAPI ML microservice.**It doesn't just show data — it predicts failures before they happen, explains why in plain English, and auto-generates maintenance tickets.**
 
-- **Column normalization** — handles camelCase, spaces, special characters automatically
 
-### 📥 CSV/Excel Data Import- **Bulk upsert** — imported data flows directly to MongoDB
+
+### 📥 CSV/Excel Data Import
 
 - **Drag-and-drop** file upload for plant and inverter data
 
-- **Auto-detection** — system identifies whether file contains plant or inverter data### 🤖 ML Predictive Maintenance
+- **Auto-detection** — system identifies whether file contains plant or inverter data**It doesn't just show data — it predicts failures before they happen, explains why with SHAP feature contributions, and auto-generates maintenance tickets.**---
 
-- **Column normalization** — handles camelCase, spaces, special characters automatically- **HistGradientBoosting** classifier trained on real solar data (95.3% accuracy, AUC-ROC 0.981)
+- **Column normalization** — handles camelCase, spaces, special characters automatically
 
-- **Bulk upsert** — imported data flows directly to MongoDB- **51 feature engineering** — DC/AC power ratios, irradiation, temperature, module efficiency
+- **Bulk upsert** — imported data flows directly to MongoDB
 
-- **SHAP explanations** — top-5 contributing factors for every prediction
 
-### 🤖 ML Predictive Maintenance (XGBoost + SHAP)- **FastAPI microservice** — `/predict`, `/predict/batch`, `/health` endpoints
+
+### 🤖 ML Predictive Maintenance (XGBoost + SHAP)---## 🏆 Built for HACKaMINeD 2026
 
 - **XGBoost Classifier** trained on real solar data (95.3% accuracy, AUC-ROC 0.981)
 
-- **29-feature engineering** — time-series lag (1, 4, 8 steps), rolling mean/std (4, 16 windows), diff, ratios### 💬 RAG + Agentic AI Chat
+- **29-feature engineering** — time-series lag (1, 4, 8 steps), rolling mean/std (4, 16 windows), diff, ratios
 
-- **SHAP TreeExplainer** — interpretable ML with feature contribution breakdown:- **RAG Pipeline** — entity extraction → MongoDB context → grounded LLM responses with source citations
+- **SHAP TreeExplainer** — interpretable ML with feature contribution breakdown:
 
-  ```json- **Agent Mode** — autonomous 4-step workflow:
+## 🏆 Built for HACKaMINeD 2026| Hackathon Pillar | How We Address It |
 
-  {  1. 📊 Data Retrieval — pulls plant/inverter/telemetry context
+```json
 
-    "feature": "inverter_temp",  2. ⚠️ Risk Assessment — ML-powered risk evaluation
+{|-----------------|-------------------|
 
-    "label": "Inverter temperature",  3. 🎫 Ticket Drafting — auto-generates maintenance tickets
+  "feature": "inverter_temp",
 
-    "value": "64.5°C",  4. 📋 Executive Summary — synthesized report
+  "label": "Inverter temperature",| Hackathon Pillar | How We Address It || 🔍 **Data Mining** | Real solar plant telemetry ingestion from CSV/Excel, 51-feature ML pipeline |
 
-    "contribution": 32.5,- **Conversational UI** — multi-turn chat with suggestion chips, agent action cards
+  "value": "64.5°C",
 
-    "direction": "positive",
+  "contribution": 32.5,|-----------------|-------------------|| 🤖 **GenAI** | Groq Llama 3.3 70B generates operational narratives from ML predictions |
 
-    "impact": "high",### 📊 GenAI Narrative Intelligence
+  "direction": "positive",
 
-    "description": "Inverter temperature at 64.5°C (elevated) increases failure risk"- **Groq Llama 3.3 70B** generates plain-English operational reports
+  "impact": "high",| 🔍 **Data Mining** | Real solar plant telemetry ingestion from CSV/Excel, 29-feature ML pipeline with lag/rolling features || 🧠 **RAG Pipeline** | Entity extraction → MongoDB context retrieval → grounded LLM Q&A with sources |
 
-  }- **3-tier fallback** — ML+Groq → ML-only → rule-based (never fails)
+  "description": "Inverter temperature at 64.5°C (elevated) increases failure risk"
 
-  ```- Confidence scores, risk classifications, prioritized recommendations
-
-- **FastAPI microservice** — `/predict/fleet`, `/predict/batch`, `/health` endpoints
-
-- **2-tier fallback** — Fleet prediction (MongoDB) → Batch prediction (direct features)### 🏠 Dashboard & Analytics
-
-- Real-time fleet KPIs with animated metric cards
-
-### 💬 RAG + Agentic AI Chat- Risk matrix and status distribution
-
-- **RAG Pipeline** — entity extraction → MongoDB context → grounded LLM responses with source citations- Performance trend charts (7-day, 30-day, 90-day)
-
-- **Guardrails** — blocks off-topic, harmful, and competitor queries- Weather integration (Open-Meteo)
-
-- **Agent Mode** — autonomous 4-step workflow:
-
-  1. 📊 Data Retrieval — pulls plant/inverter/telemetry context### ⚡ Anomaly Detection & Forecast
-
-  2. ⚠️ Risk Assessment — ML-powered risk evaluation- Real-time parameter deviation monitoring with severity scoring
-
-  3. 🎫 Ticket Drafting — auto-generates maintenance tickets- 48-hour solar generation forecast (weather-aware)
-
-  4. 📋 Executive Summary — synthesized report
-
-- **Conversational UI** — multi-turn chat with suggestion chips, agent action cards### ♻️ Carbon Impact
-
-- Daily CO₂ avoidance tracking, real-world equivalents (trees, cars, homes)
-
-### 📊 GenAI Narrative Intelligence
-
-- **Groq Llama 3.3 70B** generates plain-English operational reports### 🔧 Maintenance
-
-- **3-tier fallback** — ML+Groq → ML-only → rule-based (never fails)- AI-prioritized task queue with status tracking
-
-- Confidence scores, risk classifications, prioritized recommendations
-
-### 🌐 15-Language Support
-
-### 🏠 Dashboard & AnalyticsEvery page translates in real time — including dynamic AI-generated content:
-
-- Real-time fleet KPIs with animated metric cards
-
-- Smart power display (kW for small plants, MW for utility-scale)| Language | Code | Language | Code |
-
-- Risk matrix and status distribution (healthy/warning/critical)|----------|------|----------|------|
-
-- Performance trend charts (7-day, 30-day, 90-day)| English | `en` | Hindi | `hi` |
-
-- Weather integration (Open-Meteo)| Spanish | `es` | French | `fr` |
-
-- **Global search** — find inverters, plants, or features instantly| German | `de` | Japanese | `ja` |
-
-| Chinese | `zh` | Arabic | `ar` |
-
-### ⚡ DISCOM / Grid Page| Portuguese | `pt` | Russian | `ru` |
-
-- Grid synchronization quality monitoring| Korean | `ko` | Italian | `it` |
-
-- Frequency deviation tracking (49.5-50.5 Hz tolerance)| Dutch | `nl` | Turkish | `tr` |
-
-- Power factor analysis| Polish | `pl` | | |
-
-- Revenue impact from grid issues
-
----
-
-### ⚡ Anomaly Detection & Forecast
-
-- Real-time parameter deviation monitoring with severity scoring## 🏗️ Architecture
-
-- 48-hour solar generation forecast (weather-aware)
+}| 🤖 **GenAI** | Groq Llama 3.3 70B generates operational narratives from ML predictions || 🤖 **Agentic AI** | 4-step autonomous workflow: Data → Risk Assessment → Ticket Drafting → Summary |
 
 ```
 
-### ♻️ Carbon Impact┌────────────────────────────────────────────────────────────┐
+| 🧠 **RAG Pipeline** | Entity extraction → MongoDB context retrieval → grounded LLM Q&A with source citations || 📊 **ML Model** | HistGradientBoosting classifier, SHAP explanations, FastAPI microservice |
 
-- Daily CO₂ avoidance tracking with real-world equivalents (trees, cars, homes)│  Frontend — Next.js 14 (React 18 + TailwindCSS)           │
+- **FastAPI microservice** — `/predict/fleet`, `/predict/batch`, `/health` endpoints
 
-│  ┌──────┐ ┌──────┐ ┌──────┐ ┌─────┐ ┌──────┐ ┌────────┐  │
+- **2-tier fallback** — Fleet prediction (MongoDB) → Batch prediction (direct features)| 🤖 **Agentic AI** | 4-step autonomous workflow: Data → Risk Assessment → Ticket Drafting → Summary || 🌍 **Global Accessibility** | 15-language real-time translation across every page |
 
-### 🔧 Maintenance│  │Dash  │ │Plants│ │Invert│ │Chat │ │AI Adv│ │+6 more │  │
 
-- AI-prioritized task queue with status tracking│  └──┬───┘ └──┬───┘ └──┬───┘ └──┬──┘ └──┬───┘ └──┬─────┘  │
 
-- Auto-generated tickets from agent workflow├─────┼────────┼────────┼────────┼───────┼────────┼─────────┤
+### 💬 RAG + Agentic AI Chat| 📊 **ML Model** | XGBoost classifier with SHAP TreeExplainer for interpretable predictions || 🐳 **Production Ready** | Docker multi-container deployment, 20 unit tests, comprehensive docs |
 
-│  API Routes (17 Next.js Route Handlers)                    │
+- **RAG Pipeline** — entity extraction → MongoDB context → grounded LLM responses with source citations
 
-### 🌐 15-Language Support├────────────────────────────────────────────────────────────┤
+- **Guardrails** — blocks off-topic, harmful, and competitor queries| 🔬 **Explainability** | Top-5 SHAP feature contributions per prediction with impact percentages |
 
-Every page translates in real time — including dynamic AI-generated content:│  Backend Services                                          │
+- **Agent Mode** — autonomous 4-step workflow:
 
-│  ┌─────────┐ ┌──────┐ ┌───────┐ ┌──────┐ ┌────────────┐  │
+  1. 📊 Data Retrieval — pulls plant/inverter/telemetry context| 🌍 **Global Accessibility** | 15-language real-time translation across every page |---
 
-| Language | Code | Language | Code |│  │Dashboard│ │Plants│ │ML Pred│ │RAG   │ │Agent (Auto)│  │
+  2. ⚠️ Risk Assessment — ML-powered risk evaluation
 
-|----------|------|----------|------|│  └────┬────┘ └──┬───┘ └──┬────┘ └──┬───┘ └──┬─────────┘  │
+  3. 🎫 Ticket Drafting — auto-generates maintenance tickets| 🐳 **Production Ready** | Docker multi-container deployment, Vercel + Render hosting, comprehensive docs |
 
-| English | `en` | Hindi | `hi` |├───────┼─────────┼────────┼─────────┼────────┼─────────────┤
+  4. 📋 Executive Summary — synthesized report
 
-| Spanish | `es` | French | `fr` |│  ┌────┴─────┐ ┌─┴────────┴──┐ ┌───┴────┐ ┌─┴───────────┐│
+- **Conversational UI** — multi-turn chat with suggestion chips, agent action cards## ✨ Core Features
 
-| German | `de` | Japanese | `ja` |│  │FastAPI ML│ │MongoDB Atlas│ │Groq LLM│ │Open-Meteo   ││
 
-| Chinese | `zh` | Arabic | `ar` |│  │:8000     │ │             │ │Llama3.3│ │Weather API  ││
 
-| Portuguese | `pt` | Russian | `ru` |│  └──────────┘ └─────────────┘ └────────┘ └─────────────┘│
+### 📊 GenAI Narrative Intelligence---
 
-| Korean | `ko` | Italian | `it` |└────────────────────────────────────────────────────────────┘
+- **Groq Llama 3.3 70B** generates plain-English operational reports
 
-| Dutch | `nl` | Turkish | `tr` |```
+- **3-tier fallback** — ML+Groq → ML-only → rule-based (never fails)### 🏭 Plant-Based Architecture
+
+- Confidence scores, risk classifications, prioritized recommendations
+
+## ✨ Core Features- **Multi-plant management** — 3 solar plants, each with dedicated inverter fleets
+
+### 🏠 Dashboard & Analytics
+
+- Real-time fleet KPIs with animated metric cards- **Plant overview** — aggregated metrics per plant (total power, health score, risk level)
+
+- Smart power display (kW for small plants, MW for utility-scale)
+
+- Risk matrix and status distribution (healthy/warning/critical)### 🏭 Plant-Based Architecture- **Drill-down** — click any plant to see its inverter fleet
+
+- Performance trend charts (7-day, 30-day, 90-day)
+
+- Weather integration (Open-Meteo)- **Multi-plant management** — 3 solar plants across India (Rajasthan, Gujarat, Karnataka)
+
+- **Global search** — find inverters, plants, or features instantly
+
+- **29 inverters** — Fleet of utility-scale inverters with real-time monitoring### 📥 CSV/Excel Data Import
+
+### ⚡ DISCOM / Grid Page
+
+- Grid synchronization quality monitoring- **Plant overview** — aggregated metrics per plant (total power, health score, risk level)- **Drag-and-drop** file upload for plant and inverter data
+
+- Frequency deviation tracking (49.5-50.5 Hz tolerance)
+
+- Power factor analysis- **Drill-down** — click any plant to see its inverter fleet with real-time status- **Auto-detection** — system identifies whether file contains plant or inverter data
+
+- Revenue impact from grid issues
+
+- **Column normalization** — handles camelCase, spaces, special characters automatically
+
+### ⚡ Anomaly Detection & Forecast
+
+- Real-time parameter deviation monitoring with severity scoring### 📥 CSV/Excel Data Import- **Bulk upsert** — imported data flows directly to MongoDB
+
+- 48-hour solar generation forecast (weather-aware)
+
+- **Drag-and-drop** file upload for plant and inverter data
+
+### ♻️ Carbon Impact
+
+- Daily CO₂ avoidance tracking with real-world equivalents (trees, cars, homes)- **Auto-detection** — system identifies whether file contains plant or inverter data### 🤖 ML Predictive Maintenance
+
+
+
+### 🔧 Maintenance- **Column normalization** — handles camelCase, spaces, special characters automatically- **HistGradientBoosting** classifier trained on real solar data (95.3% accuracy, AUC-ROC 0.981)
+
+- AI-prioritized task queue with status tracking
+
+- Auto-generated tickets from agent workflow- **Bulk upsert** — imported data flows directly to MongoDB- **51 feature engineering** — DC/AC power ratios, irradiation, temperature, module efficiency
+
+
+
+### 🌐 15-Language Support- **SHAP explanations** — top-5 contributing factors for every prediction
+
+
+
+Every page translates in real time — including dynamic AI-generated content:### 🤖 ML Predictive Maintenance (XGBoost + SHAP)- **FastAPI microservice** — `/predict`, `/predict/batch`, `/health` endpoints
+
+
+
+| Language | Code | Language | Code |- **XGBoost Classifier** trained on real solar data (95.3% accuracy, AUC-ROC 0.981)
+
+|----------|------|----------|------|
+
+| English | `en` | Hindi | `hi` |- **29-feature engineering** — time-series lag (1, 4, 8 steps), rolling mean/std (4, 16 windows), diff, ratios### 💬 RAG + Agentic AI Chat
+
+| Spanish | `es` | French | `fr` |
+
+| German | `de` | Japanese | `ja` |- **SHAP TreeExplainer** — interpretable ML with feature contribution breakdown:- **RAG Pipeline** — entity extraction → MongoDB context → grounded LLM responses with source citations
+
+| Chinese | `zh` | Arabic | `ar` |
+
+| Portuguese | `pt` | Russian | `ru` |  ```json- **Agent Mode** — autonomous 4-step workflow:
+
+| Korean | `ko` | Italian | `it` |
+
+| Dutch | `nl` | Turkish | `tr` |  {  1. 📊 Data Retrieval — pulls plant/inverter/telemetry context
 
 | Polish | `pl` | | |
 
----
+    "feature": "inverter_temp",  2. ⚠️ Risk Assessment — ML-powered risk evaluation
 
 ---
 
-## 🏗️ Tech Stack
+    "label": "Inverter temperature",  3. 🎫 Ticket Drafting — auto-generates maintenance tickets
 
 ## 🏗️ Architecture
 
+    "value": "64.5°C",  4. 📋 Executive Summary — synthesized report
+
+```
+
+┌────────────────────────────────────────────────────────────────┐    "contribution": 32.5,- **Conversational UI** — multi-turn chat with suggestion chips, agent action cards
+
+│  Frontend — Next.js 14 (React 18 + TailwindCSS + Tremor)       │
+
+│  ┌──────┐ ┌──────┐ ┌──────┐ ┌─────┐ ┌──────┐ ┌────────────┐   │    "direction": "positive",
+
+│  │Dash  │ │Plants│ │Invert│ │Chat │ │AI Adv│ │Grid/DISCOM │   │
+
+│  └──┬───┘ └──┬───┘ └──┬───┘ └──┬──┘ └──┬───┘ └──┬─────────┘   │    "impact": "high",### 📊 GenAI Narrative Intelligence
+
+├─────┼────────┼────────┼────────┼───────┼────────┼──────────────┤
+
+│  API Routes (17 Next.js Route Handlers)                        │    "description": "Inverter temperature at 64.5°C (elevated) increases failure risk"- **Groq Llama 3.3 70B** generates plain-English operational reports
+
+├────────────────────────────────────────────────────────────────┤
+
+│  Backend Services                                              │  }- **3-tier fallback** — ML+Groq → ML-only → rule-based (never fails)
+
+│  ┌─────────┐ ┌──────┐ ┌───────┐ ┌──────┐ ┌────────────┐       │
+
+│  │Dashboard│ │Plants│ │ML Pred│ │RAG   │ │Agent (Auto)│       │  ```- Confidence scores, risk classifications, prioritized recommendations
+
+│  └────┬────┘ └──┬───┘ └──┬────┘ └──┬───┘ └──┬─────────┘       │
+
+├───────┼─────────┼────────┼─────────┼────────┼──────────────────┤- **FastAPI microservice** — `/predict/fleet`, `/predict/batch`, `/health` endpoints
+
+│  ┌────┴─────────┴────┐ ┌─┴────────┴──┐ ┌───┴────┐             │
+
+│  │FastAPI ML Service │ │MongoDB Atlas│ │Groq LLM│             │- **2-tier fallback** — Fleet prediction (MongoDB) → Batch prediction (direct features)### 🏠 Dashboard & Analytics
+
+│  │(XGBoost + SHAP)   │ │             │ │Llama3.3│             │
+
+│  │Render.com :8000   │ │             │ │  70B   │             │- Real-time fleet KPIs with animated metric cards
+
+│  └───────────────────┘ └─────────────┘ └────────┘             │
+
+└────────────────────────────────────────────────────────────────┘### 💬 RAG + Agentic AI Chat- Risk matrix and status distribution
+
+```
+
+- **RAG Pipeline** — entity extraction → MongoDB context → grounded LLM responses with source citations- Performance trend charts (7-day, 30-day, 90-day)
+
+---
+
+- **Guardrails** — blocks off-topic, harmful, and competitor queries- Weather integration (Open-Meteo)
+
+## 🛠️ Tech Stack
+
+- **Agent Mode** — autonomous 4-step workflow:
+
 | Layer | Technology |
 
-```|-------|-----------|
+|-------|-----------|  1. 📊 Data Retrieval — pulls plant/inverter/telemetry context### ⚡ Anomaly Detection & Forecast
 
-┌────────────────────────────────────────────────────────────────┐| **Frontend** | Next.js 14 (App Router), React 18, TailwindCSS, Framer Motion, Tremor |
+| **Frontend** | Next.js 14 (App Router), React 18, TailwindCSS, Framer Motion, Tremor |
 
-│  Frontend — Next.js 14 (React 18 + TailwindCSS + Tremor)      │| **Backend** | Next.js API Routes, Mongoose 9 |
+| **Backend** | Next.js API Routes, Mongoose 9 |  2. ⚠️ Risk Assessment — ML-powered risk evaluation- Real-time parameter deviation monitoring with severity scoring
 
-│  ┌──────┐ ┌──────┐ ┌──────┐ ┌─────┐ ┌──────┐ ┌────────────┐  │| **Database** | MongoDB Atlas |
+| **Database** | MongoDB Atlas |
 
-│  │Dash  │ │Plants│ │Invert│ │Chat │ │AI Adv│ │Grid/DISCOM │  │| **ML Model** | scikit-learn HistGradientBoostingClassifier + SHAP |
+| **ML Model** | XGBoost Classifier + SHAP TreeExplainer |  3. 🎫 Ticket Drafting — auto-generates maintenance tickets- 48-hour solar generation forecast (weather-aware)
 
-│  └──┬───┘ └──┬───┘ └──┬───┘ └──┬──┘ └──┬───┘ └──┬─────────┘  │| **ML API** | FastAPI + Uvicorn (Python 3.12) |
+| **ML Features** | 29 features: lag (1,4,8), rolling mean/std (4,16), diff, ratios |
 
-├─────┼────────┼────────┼────────┼───────┼────────┼─────────────┤| **LLM** | Groq — Llama 3.3 70B Versatile |
+| **ML API** | FastAPI + Uvicorn (Python 3.12) — hosted on Render.com |  4. 📋 Executive Summary — synthesized report
 
-│  API Routes (17 Next.js Route Handlers)                        │| **Auth** | NextAuth.js v4 (Google OAuth + Credentials) |
+| **LLM** | Groq — Llama 3.3 70B Versatile |
 
-├────────────────────────────────────────────────────────────────┤| **i18n** | 15 languages (Google Translate free endpoint) |
+| **Auth** | NextAuth.js v4 (Google OAuth + Credentials) |- **Conversational UI** — multi-turn chat with suggestion chips, agent action cards### ♻️ Carbon Impact
 
-│  Backend Services                                              │| **Import** | PapaParse (CSV) + SheetJS (Excel) |
+| **i18n** | 15 languages (Google Translate API) |
 
-│  ┌─────────┐ ┌──────┐ ┌───────┐ ┌──────┐ ┌────────────┐      │| **Testing** | Jest + ts-jest (20 tests, 3 suites) |
+| **Import** | PapaParse (CSV) + SheetJS (Excel) |- Daily CO₂ avoidance tracking, real-world equivalents (trees, cars, homes)
 
-│  │Dashboard│ │Plants│ │ML Pred│ │RAG   │ │Agent (Auto)│      │| **Deployment** | Docker (multi-stage) + Vercel |
+| **Testing** | Jest + ts-jest (20 tests, 3 suites) |
 
-│  └────┬────┘ └──┬───┘ └──┬────┘ └──┬───┘ └──┬─────────┘      │
+| **Deployment** | Vercel (Next.js) + Render (ML Service) + Docker |### 📊 GenAI Narrative Intelligence
 
-├───────┼─────────┼────────┼─────────┼────────┼─────────────────┤---
 
-│  ┌────┴─────────┴────┐ ┌─┴────────┴──┐ ┌───┴────┐            │
 
-│  │FastAPI ML Service │ │MongoDB Atlas│ │Groq LLM│            │## 📁 Project Structure
+---- **Groq Llama 3.3 70B** generates plain-English operational reports### 🔧 Maintenance
 
-│  │(XGBoost + SHAP)   │ │             │ │Llama3.3│            │
 
-│  │Render.com :8000   │ │             │ │  70B   │            │```
 
-│  └───────────────────┘ └─────────────┘ └────────┘            │solar-intel/
+## 📁 Project Structure- **3-tier fallback** — ML+Groq → ML-only → rule-based (never fails)- AI-prioritized task queue with status tracking
 
-└────────────────────────────────────────────────────────────────┘├── src/
 
-```│   ├── app/                        # Next.js pages (11 routes)
 
-│   │   ├── page.tsx                # Dashboard
+```- Confidence scores, risk classifications, prioritized recommendations
 
----│   │   ├── plants/                 # Plant overview + import UI
+solar-intel/
+
+├── src/### 🌐 15-Language Support
+
+│   ├── app/                        # Next.js pages (12 routes)
+
+│   │   ├── page.tsx                # Dashboard### 🏠 Dashboard & AnalyticsEvery page translates in real time — including dynamic AI-generated content:
+
+│   │   ├── plants/                 # Plant overview + import UI
+
+│   │   ├── inverters/              # Inverter fleet monitoring- Real-time fleet KPIs with animated metric cards
 
 │   │   ├── chat/                   # RAG + Agent chat interface
 
-## 🏗️ Tech Stack│   │   ├── ai-insights/            # GenAI health narratives
+│   │   ├── ai-insights/            # GenAI health narratives- Smart power display (kW for small plants, MW for utility-scale)| Language | Code | Language | Code |
 
 │   │   ├── analytics/              # Energy analytics
 
-| Layer | Technology |│   │   ├── anomalies/              # Anomaly detection
+│   │   ├── anomalies/              # Anomaly detection- Risk matrix and status distribution (healthy/warning/critical)|----------|------|----------|------|
+
+│   │   ├── forecast/               # Solar forecast
+
+│   │   ├── carbon/                 # Carbon tracking- Performance trend charts (7-day, 30-day, 90-day)| English | `en` | Hindi | `hi` |
+
+│   │   ├── maintenance/            # Maintenance queue
+
+│   │   ├── security/               # Grid security / DISCOM- Weather integration (Open-Meteo)| Spanish | `es` | French | `fr` |
+
+│   │   ├── settings/               # Settings
+
+│   │   └── api/                    # 17 API route handlers- **Global search** — find inverters, plants, or features instantly| German | `de` | Japanese | `ja` |
+
+│   │
+
+│   ├── backend/| Chinese | `zh` | Arabic | `ar` |
+
+│   │   ├── models/                 # Mongoose schemas (Plant, Inverter, Telemetry)
+
+│   │   └── services/               # Business logic### ⚡ DISCOM / Grid Page| Portuguese | `pt` | Russian | `ru` |
+
+│   │       ├── rag.service.ts      # RAG pipeline with guardrails
+
+│   │       ├── agent.service.ts    # Agentic 4-step workflow- Grid synchronization quality monitoring| Korean | `ko` | Italian | `it` |
+
+│   │       ├── ml-prediction.service.ts  # 2-tier ML fallback
+
+│   │       └── ai-advisor.service.ts     # 3-tier GenAI narrative- Frequency deviation tracking (49.5-50.5 Hz tolerance)| Dutch | `nl` | Turkish | `tr` |
+
+│   │
+
+│   ├── components/                 # React UI components- Power factor analysis| Polish | `pl` | | |
+
+│   ├── lib/                        # API client, auth, i18n, utilities
+
+│   └── types/                      # TypeScript interfaces- Revenue impact from grid issues
+
+│
+
+├── ml-service/                     # FastAPI ML microservice---
+
+│   ├── main.py                     # API endpoints
+
+│   ├── predict.py                  # XGBoost + SHAP TreeExplainer### ⚡ Anomaly Detection & Forecast
+
+│   ├── requirements.txt            # Python dependencies
+
+│   └── solar_inverter_xgboost_model.pkl- Real-time parameter deviation monitoring with severity scoring## 🏗️ Architecture
+
+│
+
+├── docs/- 48-hour solar generation forecast (weather-aware)
+
+│   ├── ARCHITECTURE.md             # System diagrams
+
+│   ├── RAG_SYSTEM.md               # RAG documentation```
+
+│   ├── PROMPT_DESIGN.md            # Prompt iterations
+
+│   └── REPORT.md                   # Technical report### ♻️ Carbon Impact┌────────────────────────────────────────────────────────────┐
+
+│
+
+├── docker-compose.yml              # Multi-container setup- Daily CO₂ avoidance tracking with real-world equivalents (trees, cars, homes)│  Frontend — Next.js 14 (React 18 + TailwindCSS)           │
+
+└── package.json
+
+```│  ┌──────┐ ┌──────┐ ┌──────┐ ┌─────┐ ┌──────┐ ┌────────┐  │
+
+
+
+---### 🔧 Maintenance│  │Dash  │ │Plants│ │Invert│ │Chat │ │AI Adv│ │+6 more │  │
+
+
+
+## 🚀 Getting Started- AI-prioritized task queue with status tracking│  └──┬───┘ └──┬───┘ └──┬───┘ └──┬──┘ └──┬───┘ └──┬─────┘  │
+
+
+
+### Prerequisites- Auto-generated tickets from agent workflow├─────┼────────┼────────┼────────┼───────┼────────┼─────────┤
+
+
+
+- **Node.js** 20+│  API Routes (17 Next.js Route Handlers)                    │
+
+- **Python** 3.11+
+
+- **MongoDB** Atlas account### 🌐 15-Language Support├────────────────────────────────────────────────────────────┤
+
+- **Groq** API key ([free at console.groq.com](https://console.groq.com/keys))
+
+Every page translates in real time — including dynamic AI-generated content:│  Backend Services                                          │
+
+### 1. Clone & Install
+
+│  ┌─────────┐ ┌──────┐ ┌───────┐ ┌──────┐ ┌────────────┐  │
+
+```bash
+
+git clone https://github.com/Jaimin2687/Solar-Intel.git| Language | Code | Language | Code |│  │Dashboard│ │Plants│ │ML Pred│ │RAG   │ │Agent (Auto)│  │
+
+cd Solar-Intel
+
+npm install|----------|------|----------|------|│  └────┬────┘ └──┬───┘ └──┬────┘ └──┬───┘ └──┬─────────┘  │
+
+```
+
+| English | `en` | Hindi | `hi` |├───────┼─────────┼────────┼─────────┼────────┼─────────────┤
+
+### 2. Environment Variables
+
+| Spanish | `es` | French | `fr` |│  ┌────┴─────┐ ┌─┴────────┴──┐ ┌───┴────┐ ┌─┴───────────┐│
+
+Create `.env.local`:
+
+| German | `de` | Japanese | `ja` |│  │FastAPI ML│ │MongoDB Atlas│ │Groq LLM│ │Open-Meteo   ││
+
+```env
+
+MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/solar-intel| Chinese | `zh` | Arabic | `ar` |│  │:8000     │ │             │ │Llama3.3│ │Weather API  ││
+
+NEXTAUTH_SECRET=your_nextauth_secret
+
+NEXTAUTH_URL=http://localhost:3000| Portuguese | `pt` | Russian | `ru` |│  └──────────┘ └─────────────┘ └────────┘ └─────────────┘│
+
+ML_SERVICE_URL=http://localhost:8000/predict
+
+ML_TIMEOUT_MS=30000| Korean | `ko` | Italian | `it` |└────────────────────────────────────────────────────────────┘
+
+GROQ_API_KEY=your_groq_api_key
+
+GROQ_MODEL=llama-3.3-70b-versatile| Dutch | `nl` | Turkish | `tr` |```
+
+```
+
+| Polish | `pl` | | |
+
+### 3. Seed the Database
+
+---
+
+```bash
+
+npm run seed---
+
+```
+
+## 🏗️ Tech Stack
+
+### 4. Start ML Service
+
+## 🏗️ Architecture
+
+```bash
+
+cd ml-service| Layer | Technology |
+
+python3 -m venv venv && source venv/bin/activate
+
+pip install -r requirements.txt```|-------|-----------|
+
+uvicorn main:app --host 0.0.0.0 --port 8000
+
+```┌────────────────────────────────────────────────────────────────┐| **Frontend** | Next.js 14 (App Router), React 18, TailwindCSS, Framer Motion, Tremor |
+
+
+
+### 5. Start Web App│  Frontend — Next.js 14 (React 18 + TailwindCSS + Tremor)      │| **Backend** | Next.js API Routes, Mongoose 9 |
+
+
+
+```bash│  ┌──────┐ ┌──────┐ ┌──────┐ ┌─────┐ ┌──────┐ ┌────────────┐  │| **Database** | MongoDB Atlas |
+
+npm run dev
+
+# → http://localhost:3000│  │Dash  │ │Plants│ │Invert│ │Chat │ │AI Adv│ │Grid/DISCOM │  │| **ML Model** | scikit-learn HistGradientBoostingClassifier + SHAP |
+
+```
+
+│  └──┬───┘ └──┬───┘ └──┬───┘ └──┬──┘ └──┬───┘ └──┬─────────┘  │| **ML API** | FastAPI + Uvicorn (Python 3.12) |
+
+### 6. Run Tests
+
+├─────┼────────┼────────┼────────┼───────┼────────┼─────────────┤| **LLM** | Groq — Llama 3.3 70B Versatile |
+
+```bash
+
+npm test│  API Routes (17 Next.js Route Handlers)                        │| **Auth** | NextAuth.js v4 (Google OAuth + Credentials) |
+
+# → 3 suites, 20 tests — all passing ✅
+
+```├────────────────────────────────────────────────────────────────┤| **i18n** | 15 languages (Google Translate free endpoint) |
+
+
+
+---│  Backend Services                                              │| **Import** | PapaParse (CSV) + SheetJS (Excel) |
+
+
+
+## 🐳 Docker Deployment│  ┌─────────┐ ┌──────┐ ┌───────┐ ┌──────┐ ┌────────────┐      │| **Testing** | Jest + ts-jest (20 tests, 3 suites) |
+
+
+
+```bash│  │Dashboard│ │Plants│ │ML Pred│ │RAG   │ │Agent (Auto)│      │| **Deployment** | Docker (multi-stage) + Vercel |
+
+docker-compose up --build
+
+# → Web:  http://localhost:3000│  └────┬────┘ └──┬───┘ └──┬────┘ └──┬───┘ └──┬─────────┘      │
+
+# → ML:   http://localhost:8000
+
+```├───────┼─────────┼────────┼─────────┼────────┼─────────────────┤---
+
+
+
+---│  ┌────┴─────────┴────┐ ┌─┴────────┴──┐ ┌───┴────┐            │
+
+
+
+## 🌐 Production Deployment│  │FastAPI ML Service │ │MongoDB Atlas│ │Groq LLM│            │## 📁 Project Structure
+
+
+
+| Service | Platform | URL |│  │(XGBoost + SHAP)   │ │             │ │Llama3.3│            │
+
+|---------|----------|-----|
+
+| **Next.js App** | Vercel | [solar-intel-six.vercel.app](https://solar-intel-six.vercel.app) |│  │Render.com :8000   │ │             │ │  70B   │            │```
+
+| **ML Service** | Render | solar-intel-ml.onrender.com |
+
+| **Database** | MongoDB Atlas | Cloud-hosted |│  └───────────────────┘ └─────────────┘ └────────┘            │solar-intel/
+
+
+
+---└────────────────────────────────────────────────────────────────┘├── src/
+
+
+
+## 🔑 API Routes```│   ├── app/                        # Next.js pages (11 routes)
+
+
+
+| Route | Method | Description |│   │   ├── page.tsx                # Dashboard
+
+|-------|--------|-------------|
+
+| `/api/plants` | GET | All plants with aggregated metrics |---│   │   ├── plants/                 # Plant overview + import UI
+
+| `/api/inverters` | GET/POST/PUT/DELETE | Inverter CRUD |
+
+| `/api/chat` | POST | RAG + Agent chat endpoint |│   │   ├── chat/                   # RAG + Agent chat interface
+
+| `/api/predict` | POST | ML prediction proxy |
+
+| `/api/ai-advisor` | GET | GenAI narrative generation |## 🏗️ Tech Stack│   │   ├── ai-insights/            # GenAI health narratives
+
+| `/api/dashboard` | GET | Dashboard KPIs |
+
+| `/api/import` | POST | CSV/Excel file import |│   │   ├── analytics/              # Energy analytics
+
+| `/api/grid` | GET | DISCOM/Grid sync metrics |
+
+| `/api/analytics` | GET | Analytics aggregation || Layer | Technology |│   │   ├── anomalies/              # Anomaly detection
+
+| `/api/health` | GET | System health check |
 
 |-------|-----------|│   │   ├── forecast/               # Solar forecast
 
+---
+
 | **Frontend** | Next.js 14 (App Router), React 18, TailwindCSS, Framer Motion, Tremor |│   │   ├── carbon/                 # Carbon tracking
+
+## 🧪 Testing
 
 | **Backend** | Next.js API Routes, Mongoose 9 |│   │   ├── maintenance/            # Maintenance queue
 
-| **Database** | MongoDB Atlas |│   │   ├── security/               # Grid security
+| Suite | Tests | Coverage |
 
-| **ML Model** | XGBoost Classifier + SHAP TreeExplainer |│   │   ├── settings/               # Settings
+|-------|-------|----------|| **Database** | MongoDB Atlas |│   │   ├── security/               # Grid security
 
-| **ML Features** | 29 features: lag (1,4,8), rolling mean/std (4,16), diff, ratios |│   │   └── api/                    # 17 API route handlers
+| ML Prediction | 4 | Feature mapping, defaults, normalization |
 
-| **ML API** | FastAPI + Uvicorn (Python 3.12) — hosted on Render.com |│   │       ├── chat/               # RAG + Agent chat
+| RAG Entity Extraction | 7 | Plant/inverter ID, keywords, dedup || **ML Model** | XGBoost Classifier + SHAP TreeExplainer |│   │   ├── settings/               # Settings
 
-| **LLM** | Groq — Llama 3.3 70B Versatile |│   │       ├── import/             # CSV/Excel import
+| Import Normalization | 9 | Column detection, type inference |
 
-| **Auth** | NextAuth.js v4 (Google OAuth + Credentials) |│   │       ├── plants/             # Plant CRUD
+| **Total** | **20** | **All passing ✅** || **ML Features** | 29 features: lag (1,4,8), rolling mean/std (4,16), diff, ratios |│   │   └── api/                    # 17 API route handlers
 
-| **i18n** | 15 languages (Google Translate free endpoint) |│   │       ├── predict/            # ML prediction proxy
 
-| **Import** | PapaParse (CSV) + SheetJS (Excel) |│   │       ├── ai-advisor/         # GenAI narrative
+
+---| **ML API** | FastAPI + Uvicorn (Python 3.12) — hosted on Render.com |│   │       ├── chat/               # RAG + Agent chat
+
+
+
+## 📚 Documentation| **LLM** | Groq — Llama 3.3 70B Versatile |│   │       ├── import/             # CSV/Excel import
+
+
+
+| Document | Description || **Auth** | NextAuth.js v4 (Google OAuth + Credentials) |│   │       ├── plants/             # Plant CRUD
+
+|----------|-------------|
+
+| [Architecture](./docs/ARCHITECTURE.md) | System diagrams, data flows || **i18n** | 15 languages (Google Translate free endpoint) |│   │       ├── predict/            # ML prediction proxy
+
+| [RAG System](./docs/RAG_SYSTEM.md) | RAG pipeline, guardrails, prompts |
+
+| [Prompt Design](./docs/PROMPT_DESIGN.md) | Prompt iterations with before/after || **Import** | PapaParse (CSV) + SheetJS (Excel) |│   │       ├── ai-advisor/         # GenAI narrative
+
+| [Technical Report](./docs/REPORT.md) | Model rationale, limitations |
 
 | **Testing** | Jest + ts-jest (20 tests, 3 suites) |│   │       └── ...                 # + 12 more
 
+---
+
 | **Deployment** | Vercel (Next.js) + Render (ML Service) + Docker |│   │
+
+## 🔬 ML Model Details
 
 │   ├── backend/
 
+### XGBoost Classifier
+
 ---│   │   ├── models/                 # Mongoose schemas
 
-│   │   │   ├── Plant.ts            # Plant model
+| Metric | Value |
 
-## 📁 Project Structure│   │   │   ├── Inverter.ts         # Inverter model (with plantId)
+|--------|-------|│   │   │   ├── Plant.ts            # Plant model
+
+| **Accuracy** | 95.3% |
+
+| **AUC-ROC** | 0.981 |## 📁 Project Structure│   │   │   ├── Inverter.ts         # Inverter model (with plantId)
+
+| **Features** | 29 engineered |
 
 │   │   │   ├── Telemetry.ts        # Time-series telemetry
 
+### Feature Engineering Pipeline
+
 ```│   │   │   └── User.ts
 
-solar-intel/│   │   └── services/               # Business logic
+1. **Log transforms** on skewed features (current, power, kWh)
 
-├── src/│   │       ├── rag.service.ts      # RAG pipeline
+2. **Per-inverter z-score normalization**solar-intel/│   │   └── services/               # Business logic
 
-│   ├── app/                        # Next.js pages (12 routes)│   │       ├── agent.service.ts    # Agentic 4-step workflow
+3. **Lag features** (1, 4, 8 timesteps = 15min, 1hr, 2hr)
 
-│   │   ├── page.tsx                # Dashboard│   │       ├── ml-prediction.service.ts  # 51-feature ML bridge
+4. **Rolling statistics** (mean/std over 4, 16 windows)├── src/│   │       ├── rag.service.ts      # RAG pipeline
 
-│   │   ├── plants/                 # Plant overview + import UI│   │       ├── ai-advisor.service.ts     # 3-tier GenAI narrative
+5. **Diff features** (rate of change)
 
-│   │   ├── inverters/              # Inverter fleet monitoring│   │       └── ...
+6. **Engineered ratios** (PV balance, efficiency)│   ├── app/                        # Next.js pages (12 routes)│   │       ├── agent.service.ts    # Agentic 4-step workflow
+
+
+
+### SHAP Explainability│   │   ├── page.tsx                # Dashboard│   │       ├── ml-prediction.service.ts  # 51-feature ML bridge
+
+
+
+- **TreeExplainer** for XGBoost model│   │   ├── plants/                 # Plant overview + import UI│   │       ├── ai-advisor.service.ts     # 3-tier GenAI narrative
+
+- **Top 5 features** per prediction
+
+- **Contribution %** normalized from SHAP values│   │   ├── inverters/              # Inverter fleet monitoring│   │       └── ...
+
+- **Impact levels**: High (≥25%), Medium (10-25%), Low (<10%)
 
 │   │   ├── chat/                   # RAG + Agent chat interface│   │
 
+---
+
 │   │   ├── ai-insights/            # GenAI health narratives│   ├── components/                 # React UI components
+
+## 📸 Screenshots
 
 │   │   ├── analytics/              # Energy analytics│   ├── lib/                        # API client, auth, i18n, utilities
 
-│   │   ├── anomalies/              # Anomaly detection│   ├── types/                      # TypeScript interfaces
+| Dashboard | Inverter Fleet | AI Chat |
+
+|-----------|---------------|---------|│   │   ├── anomalies/              # Anomaly detection│   ├── types/                      # TypeScript interfaces
+
+| Real-time KPIs | ML predictions | RAG + Agent |
 
 │   │   ├── forecast/               # Solar forecast│   └── __tests__/                  # Jest unit tests (3 suites, 20 tests)
 
+---
+
 │   │   ├── carbon/                 # Carbon tracking│
+
+## 👨‍💻 Author
 
 │   │   ├── maintenance/            # Maintenance queue├── ml-service/                     # FastAPI ML microservice
 
+**Jaimin Parmar** — Built with ❤️ for **HACKaMINeD 2026** 🏆
+
 │   │   ├── security/               # Grid security / DISCOM│   ├── main.py                     # /predict, /predict/batch, /health
+
+---
 
 │   │   ├── settings/               # Settings│   ├── predict.py                  # HistGradientBoosting + SHAP
 
+<div align="center">
+
 │   │   └── api/                    # 17 API route handlers│   └── Dockerfile                  # Python 3.12 slim
 
+**☀️ Solar Intel — Predict failures before they happen. One watt at a time.**
+
 │   │       ├── chat/               # RAG + Agent chat│
+
+</div>
 
 │   │       ├── import/             # CSV/Excel import├── docs/
 
