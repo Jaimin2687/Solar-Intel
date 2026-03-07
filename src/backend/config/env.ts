@@ -17,9 +17,9 @@ export const env = {
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "",
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || "",
 
-  // ML Service
-  ML_SERVICE_URL: process.env.ML_SERVICE_URL || "http://ml-service:8000/predict",
-  ML_TIMEOUT_MS: parseInt(process.env.ML_TIMEOUT_MS || "10000", 10),
+  // ML Service (Render.com hosted — cold start can take 30s on free tier)
+  ML_SERVICE_URL: process.env.ML_SERVICE_URL || "https://solar-intel-ml.onrender.com/predict",
+  ML_TIMEOUT_MS: parseInt(process.env.ML_TIMEOUT_MS || "30000", 10),
 
   // Groq AI (LLM for AI Advisor)
   GROQ_API_KEY: process.env.GROQ_API_KEY || "",
