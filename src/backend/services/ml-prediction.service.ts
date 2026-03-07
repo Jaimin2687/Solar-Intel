@@ -24,10 +24,13 @@ import logger from "@/backend/utils/logger";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 export interface ShapExplanation {
-  feature: string;
-  contribution: number;
-  direction: "positive" | "negative";
-  description: string;
+  feature: string;           // Raw feature name (e.g., "inverter_temp")
+  label: string;             // Human-readable label (e.g., "Inverter temperature")
+  value: string | null;      // Formatted value (e.g., "64.5°C", "250kW")
+  contribution: number;      // Percentage contribution (0-100)
+  direction: "positive" | "negative";  // Increases or decreases failure risk
+  impact: "high" | "medium" | "low";   // Impact magnitude
+  description: string;       // Full human-readable explanation
 }
 
 export interface MLPrediction {

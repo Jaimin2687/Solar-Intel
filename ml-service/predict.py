@@ -78,10 +78,19 @@ def _get_shap_explainer():
     return _shap_explainer if _shap_explainer != "unavailable" else None
 
 
-def get_shap_explanation(X_scaled: np.ndarray, raw_values: dict, top_n: int = 3) -> List[str]:
+def get_shap_explanation(X_scaled: np.ndarray, raw_values: dict, top_n: int = 5) -> List[Dict]:
     """
-    Generate human-readable SHAP explanation for a single prediction.
-    Returns top N contributing features with their impact direction.
+    Generate structured SHAP explanation for a single prediction.
+    Returns top N contributing features with their impact.
+    
+    Returns list of dicts with:
+      - feature: raw feature name
+      - label: human-readable feature label
+      - value: actual value (if available)
+      - contribution: absolute SHAP contribution (0-1 normalized)
+      - direction: "positive" (increases risk) or "negative" (decreases risk)
+      - impact: "high", "medium", or "low" based on contribution magnitude
+      - description: human-readable explanation
     """
     explainer = _get_shap_explainer()
     if explainer is None:
@@ -95,33 +104,96 @@ def get_shap_explanation(X_scaled: np.ndarray, raw_values: dict, top_n: int = 3)
         
         shap_vals = shap_values[0] if len(shap_values.shape) > 1 else shap_values
         
+        # Normalize SHAP values to get relative contribution percentages
+        abs_shap = np.abs(shap_vals)
+        total_shap = abs_shap.sum() if abs_shap.sum() > 0 else 1.0
+        normalized = abs_shap / total_shap
+        
         # Get top N features by absolute SHAP value
-        indices = np.argsort(np.abs(shap_vals))[::-1][:top_n]
+        indices = np.argsort(abs_shap)[::-1][:top_n]
         
         explanations = []
         for idx in indices:
             feat_name = _features[idx]
             shap_val = shap_vals[idx]
-            direction = "↑ increases" if shap_val > 0 else "↓ decreases"
+            contribution = float(normalized[idx])
+            direction = "positive" if shap_val > 0 else "negative"
+            
+            # Skip negligible contributions
+            if contribution < 0.01:
+                continue
             
             # Human-readable feature name
-            readable = FEATURE_LABELS.get(feat_name, feat_name.replace("_", " ").title())
+            label = FEATURE_LABELS.get(feat_name, feat_name.replace("_", " ").title())
             
-            # Add actual value context if available
-            raw_val = raw_values.get(feat_name)
-            if raw_val is not None and not np.isnan(raw_val):
-                if "temp" in feat_name:
-                    explanations.append(f"{readable} ({raw_val:.1f}°C) {direction} risk")
-                elif "power" in feat_name and "ratio" not in feat_name:
-                    explanations.append(f"{readable} ({raw_val/1000:.1f}kW) {direction} risk")
-                elif "voltage" in feat_name:
-                    explanations.append(f"{readable} ({raw_val:.0f}V) {direction} risk")
-                else:
-                    explanations.append(f"{readable} {direction} risk")
+            # Determine impact level
+            if contribution >= 0.25:
+                impact = "high"
+            elif contribution >= 0.10:
+                impact = "medium"
             else:
-                explanations.append(f"{readable} {direction} risk")
+                impact = "low"
+            
+            # Get actual value and format description
+            raw_val = raw_values.get(feat_name)
+            value_str = None
+            description = ""
+            
+            if "temp" in feat_name and "ratio" not in feat_name:
+                if raw_val is not None and not np.isnan(raw_val):
+                    value_str = f"{raw_val:.1f}°C"
+                    if raw_val > 65:
+                        description = f"{label} at {value_str} (critical) {'increases' if direction == 'positive' else 'decreases'} failure risk"
+                    elif raw_val > 50:
+                        description = f"{label} at {value_str} (elevated) {'increases' if direction == 'positive' else 'decreases'} failure risk"
+                    else:
+                        description = f"{label} at {value_str} {'increases' if direction == 'positive' else 'decreases'} failure risk"
+                else:
+                    description = f"{label} {'increases' if direction == 'positive' else 'decreases'} failure risk"
+                    
+            elif "power" in feat_name and "ratio" not in feat_name:
+                if raw_val is not None and not np.isnan(raw_val):
+                    if raw_val >= 1000:
+                        value_str = f"{raw_val/1000:.1f}kW"
+                    else:
+                        value_str = f"{raw_val:.0f}W"
+                    if "std" in feat_name or "rstd" in feat_name:
+                        description = f"Power volatility ({label}) {'increases' if direction == 'positive' else 'decreases'} failure risk"
+                    elif "diff" in feat_name:
+                        description = f"Rapid power change {'increases' if direction == 'positive' else 'decreases'} failure risk"
+                    else:
+                        description = f"{label} at {value_str} {'increases' if direction == 'positive' else 'decreases'} failure risk"
+                else:
+                    description = f"{label} {'increases' if direction == 'positive' else 'decreases'} failure risk"
+                    
+            elif "voltage" in feat_name:
+                if raw_val is not None and not np.isnan(raw_val):
+                    value_str = f"{raw_val:.0f}V"
+                    description = f"{label} at {value_str} {'increases' if direction == 'positive' else 'decreases'} failure risk"
+                else:
+                    description = f"{label} {'increases' if direction == 'positive' else 'decreases'} failure risk"
+                    
+            elif feat_name == "pv_power_ratio":
+                description = f"PV string balance {'increases' if direction == 'positive' else 'decreases'} failure risk"
+                
+            elif feat_name == "power_temp_ratio":
+                description = f"Efficiency ratio {'increases' if direction == 'positive' else 'decreases'} failure risk"
+                
+            else:
+                description = f"{label} {'increases' if direction == 'positive' else 'decreases'} failure risk"
+            
+            explanations.append({
+                "feature": feat_name,
+                "label": label,
+                "value": value_str,
+                "contribution": round(contribution * 100, 1),  # As percentage
+                "direction": direction,
+                "impact": impact,
+                "description": description,
+            })
         
         return explanations
+        
     except Exception as e:
         print(f"[SHAP] Explanation failed: {e}")
         return []
