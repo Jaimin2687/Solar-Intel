@@ -11,7 +11,7 @@ services:
     env_file:
       - .env.local
     environment:
-      - ML_SERVICE_URL=http://ml-service:8000/predict
+      - ML_SERVICE_URL=https://solar-intel-ml.onrender.com/predict
     depends_on:
       ml-service:
         condition: service_healthy
