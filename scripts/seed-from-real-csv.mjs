@@ -10,6 +10,10 @@
  * - ~29 inverters total with real telemetry from CSV
  * - Last 96 records per inverter (24h of 15-min intervals)
  * - Risk scores computed from ACTUAL failure labels in CSV
+ *
+ * Usage:
+ *   export MONGODB_URI="your_mongodb_connection_string"
+ *   node scripts/seed-from-real-csv.mjs
  * ─────────────────────────────────────────────────────────
  */
 
@@ -18,13 +22,21 @@ import { createReadStream } from "fs";
 import { createInterface } from "readline";
 import path from "path";
 import { fileURLToPath } from "url";
+import { config } from "dotenv";
+
+// Load .env.local
+config({ path: ".env.local" });
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const MONGO_URI =
-  "mongodb+srv://jaiminparmar2687_db_user:OvDtBK33Cqal8S1h@cluster0.ivdhx58.mongodb.net/solar-intel?retryWrites=true&w=majority&appName=Cluster0";
+const MONGO_URI = process.env.MONGODB_URI;
+if (!MONGO_URI) {
+  console.error("❌ MONGODB_URI environment variable is required");
+  console.error("   Set it in .env.local or export it before running this script");
+  process.exit(1);
+}
 
-const CSV_PATH = path.resolve(__dirname, "../../Solar_Plant_Dataset/master_refined.csv");
+const CSV_PATH = process.env.CSV_PATH || path.resolve(__dirname, "../../Solar_Plant_Dataset/master_refined.csv");
 
 // How many records per inverter to seed as telemetry
 const RECORDS_PER_INVERTER = 96;

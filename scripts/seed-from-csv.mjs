@@ -7,16 +7,26 @@
  *   - inverters    (29 docs — one per unique plant+inverter, latest snapshot)
  *   - telemetryrecords (sampled time-series rows)
  *
- * Usage:  node scripts/seed-from-csv.mjs
+ * Usage:  
+ *   export MONGODB_URI="your_mongodb_connection_string"
+ *   node scripts/seed-from-csv.mjs
  */
 
 import { readFileSync } from "fs";
 import { MongoClient } from "mongodb";
+import { config } from "dotenv";
+
+// Load .env.local
+config({ path: ".env.local" });
 
 // ── Config ──
-const CSV_PATH = "/Users/jaimin/HM/Solar_Plant_Dataset/master_refined.csv";
-const MONGO_URI =
-  "mongodb+srv://jaiminparmar2687_db_user:OvDtBK33Cqal8S1h@cluster0.ivdhx58.mongodb.net/solar-intel?retryWrites=true&w=majority&appName=Cluster0";
+const CSV_PATH = process.env.CSV_PATH || "/Users/jaimin/HM/Solar_Plant_Dataset/master_refined.csv";
+const MONGO_URI = process.env.MONGODB_URI;
+if (!MONGO_URI) {
+  console.error("❌ MONGODB_URI environment variable is required");
+  console.error("   Set it in .env.local or export it before running this script");
+  process.exit(1);
+}
 const DB_NAME = "solar-intel";
 const TELEMETRY_SAMPLE = 15000; // how many telemetry rows to keep (last N)
 

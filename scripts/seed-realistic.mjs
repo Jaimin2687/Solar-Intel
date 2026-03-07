@@ -5,7 +5,9 @@
  * telemetry data covering LOW, MEDIUM, HIGH, and CRITICAL risk profiles.
  * Also inserts 24h of telemetry records (every 15 min = 96 per inverter).
  *
- * Usage: node scripts/seed-realistic.mjs
+ * Usage: 
+ *   export MONGODB_URI="your_mongodb_connection_string"
+ *   node scripts/seed-realistic.mjs
  */
 
 import mongoose from "mongoose";
@@ -19,7 +21,12 @@ const __dirname = dirname(__filename);
 // Load .env.local
 dotenv.config({ path: resolve(__dirname, "../.env.local") });
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/solar-intel";
+const MONGODB_URI = process.env.MONGODB_URI;
+if (!MONGODB_URI) {
+  console.error("❌ MONGODB_URI environment variable is required");
+  console.error("   Set it in .env.local or export it before running this script");
+  process.exit(1);
+}
 
 // ─────────────────────────────────────────────
 // 3 Plants
