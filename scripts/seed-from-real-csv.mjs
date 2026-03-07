@@ -42,22 +42,19 @@ const CSV_PATH = process.env.CSV_PATH || path.resolve(__dirname, "../../Solar_Pl
 const RECORDS_PER_INVERTER = 96;
 
 // Plant metadata (realistic utility-scale capacity in MW)
+// Each plant's inverters should produce power close to plant capacity during peak hours
 const PLANT_META = {
   "Plant 1": { name: "Rajasthan Solar Park", location: "Rajasthan, India", lat: 26.9124, lng: 70.9012, capacity: 50, area: 200 },
   "Plant 2": { name: "Gujarat Solar Farm",   location: "Gujarat, India",   lat: 23.0225, lng: 72.5714, capacity: 25, area: 100 },
   "Plant 3": { name: "Karnataka PV Station", location: "Karnataka, India", lat: 15.3173, lng: 75.7139, capacity: 10, area: 40 },
 };
 
-// Per-inverter rated capacity in kW (utility-scale inverters: 250-500kW each)
-const INVERTER_CAPACITY_KW = {
-  "Plant 1": 250,   // 23 inverters × 250kW = 5.75 MW nameplate (50MW plant has headroom)
-  "Plant 2": 200,   // 5 inverters × 200kW = 1 MW 
-  "Plant 3": 150,   // 1 inverter × 150kW = 0.15 MW
-};
+// We'll calculate inverter capacity dynamically based on plant capacity and inverter count
+// This ensures total inverter capacity ≈ plant capacity
 
-// Scaling factor: CSV has ~350W max, we want ~250kW = scale by ~714x
-// We'll use a more conservative 500x to get ~175kW typical power
-const POWER_SCALE = 500;
+// Base scaling factor for CSV data (~350W max in CSV)
+// We'll apply plant-specific multipliers to achieve realistic power output
+const BASE_POWER_SCALE = 500;
 
 async function main() {
   console.log("═══════════════════════════════════════════════════════");
@@ -81,11 +78,30 @@ async function main() {
   await db.collection("telemetryrecords").deleteMany({});
   console.log("🗑️  Cleared existing data\n");
 
-  // Step 4: Insert plants
+  // Step 4: Insert plants and calculate inverter capacities
   const plantDocs = [];
+  const plantInverterCapacity = {}; // kW per inverter for each plant
+  const plantPowerScale = {}; // Power scaling factor per plant
+  
   for (const [plantId, meta] of Object.entries(PLANT_META)) {
     const invCount = data.inverters.filter(k => k.startsWith(plantId + "/")).length;
     if (invCount === 0) continue;
+    
+    // Calculate per-inverter capacity to match plant capacity
+    // Plant capacity is in MW, we need kW per inverter
+    const plantCapacityKw = meta.capacity * 1000; // Convert MW to kW
+    const perInverterCapacityKw = Math.round(plantCapacityKw / invCount);
+    plantInverterCapacity[plantId] = perInverterCapacityKw;
+    
+    // Calculate power scale to achieve realistic power output
+    // CSV has ~350W max per inverter, we want ~70-85% of perInverterCapacityKw at peak
+    // So scale factor = (perInverterCapacityKw * 0.80) / 0.35 (350W in kW)
+    const targetPeakKw = perInverterCapacityKw * 0.80; // 80% capacity factor at peak sun
+    const csvMaxKw = 0.35; // ~350W max in CSV
+    plantPowerScale[plantId] = Math.round(targetPeakKw / csvMaxKw);
+    
+    console.log(`   ${plantId}: ${invCount} inverters × ${perInverterCapacityKw} kW = ${meta.capacity} MW, scale=${plantPowerScale[plantId]}x`);
+    
     plantDocs.push({
       plantId,
       name: meta.name,
@@ -104,7 +120,7 @@ async function main() {
   }
   if (plantDocs.length > 0) {
     await db.collection("plants").insertMany(plantDocs);
-    console.log(`🌱 Inserted ${plantDocs.length} plants`);
+    console.log(`🌱 Inserted ${plantDocs.length} plants\n`);
   }
 
   // Step 5: Insert inverters + telemetry
@@ -143,17 +159,18 @@ async function main() {
     }
 
     const inverterId = `INV-${plantId.replace("Plant ", "P")}-${invId}`;
-    const ratedCapacityKw = INVERTER_CAPACITY_KW[plantId] || 250;
+    const ratedCapacityKw = plantInverterCapacity[plantId] || 2000; // Use plant-specific capacity
+    const powerScale = plantPowerScale[plantId] || BASE_POWER_SCALE; // Use plant-specific scale
 
-    // Scale power values to realistic utility-scale (CSV has ~350W, we want ~175kW)
+    // Scale power values to realistic utility-scale based on plant capacity
     const scaledRows = telemetryRows.map(r => ({
       ...r,
-      inverter_power: (r.inverter_power || 0) * POWER_SCALE,
-      inverter_pv1_power: (r.inverter_pv1_power || 0) * POWER_SCALE,
-      inverter_pv2_power: (r.inverter_pv2_power || 0) * POWER_SCALE,
-      inverter_kwh_today: (r.inverter_kwh_today || 0) * POWER_SCALE,
-      inverter_kwh_total: (r.inverter_kwh_total || 0) * POWER_SCALE,
-      meter_active_power: (r.meter_active_power || 0) * POWER_SCALE,
+      inverter_power: (r.inverter_power || 0) * powerScale,
+      inverter_pv1_power: (r.inverter_pv1_power || 0) * powerScale,
+      inverter_pv2_power: (r.inverter_pv2_power || 0) * powerScale,
+      inverter_kwh_today: (r.inverter_kwh_today || 0) * powerScale,
+      inverter_kwh_total: (r.inverter_kwh_total || 0) * powerScale,
+      meter_active_power: (r.meter_active_power || 0) * powerScale,
     }));
     const lastScaled = scaledRows[scaledRows.length - 1];
 
@@ -192,18 +209,18 @@ async function main() {
       location: PLANT_META[plantId]?.location || "India",
       status,
       riskScore,
-      capacity: ratedCapacityKw, // in kW (utility-scale: 150-250kW)
+      capacity: ratedCapacityKw, // in kW (utility-scale, calculated per plant)
       efficiency: Math.max(efficiency, 15),
       performanceRatio: Math.max(Math.round(performanceRatio * 10) / 10, 15),
       uptime: status === "critical" ? 70 + Math.random() * 10 : status === "warning" ? 85 + Math.random() * 10 : 95 + Math.random() * 5,
-      // Latest telemetry snapshot (SCALED to realistic values)
+      // Latest telemetry snapshot (SCALED to realistic values using plant-specific scale)
       inverterPower: Math.round(lastScaled.inverter_power),
       inverterPv1Power: Math.round(lastScaled.inverter_pv1_power),
       inverterPv1Voltage: Math.round((lastRow.inverter_pv1_voltage || 0) * 10) / 10, // Voltage doesn't scale
-      inverterPv1Current: Math.round((lastRow.inverter_pv1_current || 0) * POWER_SCALE / 100) / 10, // Current scales with power
+      inverterPv1Current: Math.round((lastRow.inverter_pv1_current || 0) * powerScale / 100) / 10, // Current scales with power
       inverterPv2Power: Math.round(lastScaled.inverter_pv2_power),
       inverterPv2Voltage: Math.round((lastRow.inverter_pv2_voltage || 0) * 10) / 10,
-      inverterPv2Current: Math.round((lastRow.inverter_pv2_current || 0) * POWER_SCALE / 100) / 10,
+      inverterPv2Current: Math.round((lastRow.inverter_pv2_current || 0) * powerScale / 100) / 10,
       inverterKwhToday: Math.round(lastScaled.inverter_kwh_today),
       inverterKwhTotal: Math.round(lastScaled.inverter_kwh_total),
       inverterTemp: Math.round((lastRow.inverter_temp || 35) * 10) / 10, // Temp doesn't scale, round to 1 decimal
@@ -219,7 +236,7 @@ async function main() {
     await db.collection("inverters").insertOne(inverterDoc);
     totalInverters++;
 
-    // Telemetry records (SCALED to realistic values)
+    // Telemetry records (SCALED to realistic values using plant-specific scale)
     const teleDocs = scaledRows.map((r, i) => ({
       inverterId,
       plantId,
@@ -227,10 +244,10 @@ async function main() {
       inverterPower: Math.round(r.inverter_power),
       inverterPv1Power: Math.round(r.inverter_pv1_power),
       inverterPv1Voltage: Math.round((telemetryRows[i].inverter_pv1_voltage || 0) * 10) / 10,
-      inverterPv1Current: Math.round((telemetryRows[i].inverter_pv1_current || 0) * POWER_SCALE / 100) / 10,
+      inverterPv1Current: Math.round((telemetryRows[i].inverter_pv1_current || 0) * powerScale / 100) / 10,
       inverterPv2Power: Math.round(r.inverter_pv2_power),
       inverterPv2Voltage: Math.round((telemetryRows[i].inverter_pv2_voltage || 0) * 10) / 10,
-      inverterPv2Current: Math.round((telemetryRows[i].inverter_pv2_current || 0) * POWER_SCALE / 100) / 10,
+      inverterPv2Current: Math.round((telemetryRows[i].inverter_pv2_current || 0) * powerScale / 100) / 10,
       inverterKwhToday: Math.round(r.inverter_kwh_today),
       inverterKwhTotal: Math.round(r.inverter_kwh_total),
       inverterTemp: Math.round((telemetryRows[i].inverter_temp || 35) * 10) / 10,

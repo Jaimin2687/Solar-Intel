@@ -201,7 +201,12 @@ function PlantCard({ plant, onClick }: { plant: Plant; onClick: () => void }) {
         </div>
         <div className="rounded-lg bg-muted/50 p-3">
           <div className="text-xs text-muted-foreground mb-1"><TranslatedText text="Power Output" /></div>
-          <div className="text-lg font-bold text-foreground">{plant.totalPower || 0} <span className="text-xs font-normal text-muted-foreground">kW</span></div>
+          <div className="text-lg font-bold text-foreground">
+            {(plant.totalPower || 0) >= 1000 
+              ? <>{((plant.totalPower || 0) / 1000).toFixed(1)} <span className="text-xs font-normal text-muted-foreground">MW</span></>
+              : <>{(plant.totalPower || 0).toFixed(1)} <span className="text-xs font-normal text-muted-foreground">kW</span></>
+            }
+          </div>
         </div>
         <div className="rounded-lg bg-muted/50 p-3">
           <div className="text-xs text-muted-foreground mb-1"><TranslatedText text="Health Score" /></div>
