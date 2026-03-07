@@ -23,6 +23,13 @@ import logger from "@/backend/utils/logger";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+export interface ShapExplanation {
+  feature: string;
+  contribution: number;
+  direction: "positive" | "negative";
+  description: string;
+}
+
 export interface MLPrediction {
   inverter_id: string;
   plant_id: string;
@@ -31,6 +38,7 @@ export interface MLPrediction {
   failure_predicted: boolean;
   status: string;
   top_factors: string[];
+  shap_explanation?: ShapExplanation[];
   recommended_action: string;
 }
 

@@ -163,6 +163,19 @@ export async function getDashboardData(): Promise<DashboardData> {
   // For now keep MW but with proper rounding to 3 decimals for small values
   const totalMw = Math.round(totalKw * 1000) / 1000000; // kW to MW, 3 decimals
 
+  // Use DB status as authority for failure predictions (ML batch fallback can be inaccurate)
+  // Only count inverters with DB riskScore >= 60 OR critical status as "predicted failures"
+  const predictedFailureCount = mlPredictions
+    ? dbInverters.filter((inv: any) => {
+        const ml = mlPredictions.find((p) => p.inverter_id === inv.inverterId);
+        // Trust DB risk score over ML batch fallback
+        const dbRisk = inv.riskScore || 0;
+        const mlRisk = ml ? ml.risk_score * 100 : 0;
+        // Failure predicted if: DB says critical/high risk OR ML says failure AND DB agrees (risk >= 40)
+        return inv.status === "critical" || dbRisk >= 60 || (ml?.failure_predicted && dbRisk >= 40);
+      }).length
+    : criticalCount;
+
   const systemHealth: SystemHealth = {
     totalInverters: inverters.length,
     healthyCount,
@@ -174,9 +187,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     totalPowerOutput: totalMw < 0.001 ? 0.001 : totalMw, // Minimum 0.001 to avoid showing 0
     systemUptime:
       Math.round((inverters.reduce((s, i) => s + (i.uptime || 0), 0) / (inverters.length || 1)) * 10) / 10,
-    predictedFailures: mlPredictions
-      ? mlPredictions.filter((p) => p.failure_predicted).length
-      : criticalCount,
+    predictedFailures: predictedFailureCount,
   };
 
   // ── 30-day Performance Trends ──

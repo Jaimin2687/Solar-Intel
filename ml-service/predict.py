@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 ═══════════════════════════════════════════════════════════════
-Solar Intel — ML Inference  (v4: Full Pipeline from MongoDB)
+Solar Intel — ML Inference  (v5: SHAP Explanations)
 ═══════════════════════════════════════════════════════════════
 Replicates the EXACT training preprocessing pipeline:
   1. Log1p transforms on skewed features
@@ -10,6 +10,11 @@ Replicates the EXACT training preprocessing pipeline:
   4. Rolling mean/std (4, 16 window)
   5. Diff features
   6. Engineered ratios
+
+NEW in v5:
+  - SHAP TreeExplainer for XGBoost model
+  - Returns feature contributions per prediction
+  - Human-readable SHAP explanation strings
 
 Connects directly to MongoDB Atlas to pull telemetry history,
 so the model sees the same data shape it was trained on.
@@ -20,7 +25,7 @@ import os
 import pickle
 import warnings
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List, Dict
 
 import numpy as np
 import pandas as pd
@@ -52,7 +57,75 @@ NORMALIZE_COLS = _artifact.get("normalize_cols", [
     "meter_active_power",
 ])
 
-print(f"[predict.py v4] Loaded model: {len(_features)} features, version={_artifact.get('version')}")
+print(f"[predict.py v5] Loaded model: {len(_features)} features, version={_artifact.get('version')}")
+
+# ─────────────────────────────────────────────────────────────
+# SHAP Explainer (lazy initialization)
+# ─────────────────────────────────────────────────────────────
+_shap_explainer = None
+
+def _get_shap_explainer():
+    """Lazy-load SHAP TreeExplainer for XGBoost model."""
+    global _shap_explainer
+    if _shap_explainer is None:
+        try:
+            import shap
+            _shap_explainer = shap.TreeExplainer(_raw_model)
+            print("[predict.py v5] SHAP TreeExplainer initialized")
+        except Exception as e:
+            print(f"[predict.py v5] SHAP init failed: {e}")
+            _shap_explainer = "unavailable"
+    return _shap_explainer if _shap_explainer != "unavailable" else None
+
+
+def get_shap_explanation(X_scaled: np.ndarray, raw_values: dict, top_n: int = 3) -> List[str]:
+    """
+    Generate human-readable SHAP explanation for a single prediction.
+    Returns top N contributing features with their impact direction.
+    """
+    explainer = _get_shap_explainer()
+    if explainer is None:
+        return []
+
+    try:
+        shap_values = explainer.shap_values(X_scaled)
+        # For binary classification, shap_values might be a list [neg_class, pos_class]
+        if isinstance(shap_values, list):
+            shap_values = shap_values[1]  # Use positive class (failure)
+        
+        shap_vals = shap_values[0] if len(shap_values.shape) > 1 else shap_values
+        
+        # Get top N features by absolute SHAP value
+        indices = np.argsort(np.abs(shap_vals))[::-1][:top_n]
+        
+        explanations = []
+        for idx in indices:
+            feat_name = _features[idx]
+            shap_val = shap_vals[idx]
+            direction = "↑ increases" if shap_val > 0 else "↓ decreases"
+            
+            # Human-readable feature name
+            readable = FEATURE_LABELS.get(feat_name, feat_name.replace("_", " ").title())
+            
+            # Add actual value context if available
+            raw_val = raw_values.get(feat_name)
+            if raw_val is not None and not np.isnan(raw_val):
+                if "temp" in feat_name:
+                    explanations.append(f"{readable} ({raw_val:.1f}°C) {direction} risk")
+                elif "power" in feat_name and "ratio" not in feat_name:
+                    explanations.append(f"{readable} ({raw_val/1000:.1f}kW) {direction} risk")
+                elif "voltage" in feat_name:
+                    explanations.append(f"{readable} ({raw_val:.0f}V) {direction} risk")
+                else:
+                    explanations.append(f"{readable} {direction} risk")
+            else:
+                explanations.append(f"{readable} {direction} risk")
+        
+        return explanations
+    except Exception as e:
+        print(f"[SHAP] Explanation failed: {e}")
+        return []
+
 
 # ─────────────────────────────────────────────────────────────
 # MongoDB connection (lazy)
@@ -363,6 +436,9 @@ def predict_fleet(inverter_ids: list) -> list:
         risk_level = _get_risk_level(risk_score)
 
         raw = raw_vals.get(inv_id, {})
+        
+        # Get SHAP explanations for this prediction
+        shap_explanation = get_shap_explanation(X_scaled, raw, top_n=3)
 
         results.append({
             "inverter_id": inv_id,
@@ -372,12 +448,13 @@ def predict_fleet(inverter_ids: list) -> list:
             "failure_predicted": risk_score >= 0.5,
             "status": STATUS_MESSAGES[risk_level],
             "top_factors": _get_top_factors(raw, risk_score),
+            "shap_explanation": shap_explanation,  # NEW: SHAP-based explanation
             "recommended_action": RECOMMENDED_ACTIONS[risk_level],
         })
 
     if results:
         scores = [r["risk_score"] for r in results]
-        print(f"[predict.py v4] Fleet prediction: {len(results)} inverters, "
+        print(f"[predict.py v5] Fleet prediction: {len(results)} inverters, "
               f"risk range {min(scores):.4f}-{max(scores):.4f}")
 
     return results
@@ -391,11 +468,12 @@ def _single_fallback(inv_id: str) -> dict:
     return {
         "inverter_id": inv_id,
         "plant_id": "Unknown",
-        "risk_score": 0.5,
-        "risk_level": "medium",
+        "risk_score": 0.25,  # Default to low-medium, not 0.5 which triggers failure_predicted
+        "risk_level": "low",
         "failure_predicted": False,
         "status": "Insufficient telemetry data for ML prediction",
         "top_factors": ["Insufficient telemetry history - using default risk"],
+        "shap_explanation": [],
         "recommended_action": "Ensure telemetry data is being collected. Schedule routine inspection.",
     }
 
