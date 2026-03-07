@@ -26,7 +26,7 @@
 
 Solar Intel is a **full-stack intelligent solar plant management platform** that combines:
 
-- 🤖 **ML Predictive Maintenance** — 95.3% accuracy, AUC-ROC 0.981 (XGBoost / HistGradientBoosting)
+- 🤖 **ML Predictive Maintenance** — 95.3% accuracy, AUC-ROC 0.981 (XGBoost)
 - 💬 **RAG Conversational AI** — entity-aware Q&A grounded in live MongoDB fleet data
 - 🧠 **Agentic AI Workflows** — 4-step autonomous pipeline: Data → Risk → Tickets → Summary
 - 📊 **GenAI Narratives** — Groq Llama 3.3 70B generates plain-English operational reports
@@ -126,7 +126,7 @@ Solar Intel is a **full-stack intelligent solar plant management platform** that
 | **Frontend**   | Next.js 14 (App Router), React 18, TailwindCSS, Framer Motion, Tremor |
 | **Backend**    | Next.js API Routes, Mongoose 9                                        |
 | **Database**   | MongoDB Atlas                                                         |
-| **ML Model**   | XGBoost + scikit-learn HistGradientBoosting + SHAP                    |
+| **ML Model**   | XGBoost + SHAP                                                        |
 | **ML API**     | FastAPI + Uvicorn (Python 3.12)                                       |
 | **LLM**        | Groq — Llama 3.3 70B Versatile                                        |
 | **Auth**       | NextAuth.js v4 (Google OAuth + Credentials)                           |
@@ -316,14 +316,7 @@ docker-compose up --build
 
 **Task:** Binary classification — `healthy` vs `faulty` inverter
 
-**Why HistGradientBoosting over alternatives:**
-
-| Model                    | Accuracy  | AUC-ROC   | NaN Handling | Selected |
-| ------------------------ | --------- | --------- | ------------ | -------- |
-| **HistGradientBoosting** | **95.3%** | **0.981** | ✅ Native    | ✅ Yes   |
-| XGBoost                  | 94.8%     | 0.975     | ❌ Manual    | No       |
-| Random Forest            | 93.1%     | 0.962     | ❌ No        | No       |
-| Neural Network           | 91.2%     | 0.948     | Partial      | No       |
+**Model:** XGBoost classifier — 95.3% accuracy, AUC-ROC 0.981
 
 **Preprocessing Pipeline (inference replicates training exactly):**
 
