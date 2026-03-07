@@ -69,13 +69,19 @@ const colorMap = {
 };
 
 export function RiskOverview({ data }: RiskOverviewProps) {
+  // Smart power display: kW for small values, MW for large
+  const powerMw = data.totalPowerOutput;
+  const powerDisplay = powerMw >= 1 
+    ? `${powerMw.toFixed(1)} MW` 
+    : `${(powerMw * 1000).toFixed(1)} kW`;
+
   const metrics: MetricCard[] = [
     { label: "Total Inverters",   value: data.totalInverters,       subtitle: "Across all sites",          icon: Server,      color: "default"  },
     { label: "Healthy",           value: data.healthyCount,         subtitle: `${Math.round((data.healthyCount / data.totalInverters) * 100)}% of fleet`, icon: Activity, trend: "+2", color: "healthy" },
     { label: "Warnings",          value: data.warningCount,         subtitle: "Require attention",         icon: AlertTriangle, color: "warning" },
     { label: "Critical Risk",     value: data.criticalCount,        subtitle: "Immediate action needed",   icon: ShieldAlert, color: "critical" },
     { label: "Avg Performance",   value: `${data.avgPerformanceRatio}%`, subtitle: "Fleet-wide ratio",     icon: TrendingUp,  trend: "+1.2%", color: "info" },
-    { label: "Total Output",      value: `${data.totalPowerOutput} MW`, subtitle: "Combined generation",   icon: Zap,         color: "default"  },
+    { label: "Total Output",      value: powerDisplay,              subtitle: "Combined generation",       icon: Zap,         color: "default"  },
     { label: "System Uptime",     value: `${data.systemUptime}%`,   subtitle: "Last 30 days",              icon: Clock,       color: "healthy"  },
     { label: "AI Predictions",    value: data.predictedFailures,    subtitle: "Failures predicted (7d)",   icon: Brain,       color: "critical" },
   ];

@@ -158,6 +158,11 @@ export async function getDashboardData(): Promise<DashboardData> {
   const warningCount = inverters.filter((i) => i.status === "warning").length;
   const criticalCount = inverters.filter((i) => i.status === "critical").length;
 
+  const totalKw = inverters.reduce((s, i) => s + (i.powerOutput || 0), 0);
+  // Show in MW if > 1MW, otherwise show kW (frontend label will need adjustment)
+  // For now keep MW but with proper rounding to 3 decimals for small values
+  const totalMw = Math.round(totalKw * 1000) / 1000000; // kW to MW, 3 decimals
+
   const systemHealth: SystemHealth = {
     totalInverters: inverters.length,
     healthyCount,
@@ -165,8 +170,8 @@ export async function getDashboardData(): Promise<DashboardData> {
     criticalCount,
     avgPerformanceRatio:
       Math.round((inverters.reduce((s, i) => s + (i.performanceRatio || 0), 0) / (inverters.length || 1)) * 10) / 10,
-    totalPowerOutput:
-      Math.round(inverters.reduce((s, i) => s + (i.powerOutput || 0), 0) / 100) / 10,
+    // powerOutput is in kW, convert to MW (round to 3 decimals for small fleets)
+    totalPowerOutput: totalMw < 0.001 ? 0.001 : totalMw, // Minimum 0.001 to avoid showing 0
     systemUptime:
       Math.round((inverters.reduce((s, i) => s + (i.uptime || 0), 0) / (inverters.length || 1)) * 10) / 10,
     predictedFailures: mlPredictions
