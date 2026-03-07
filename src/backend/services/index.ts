@@ -17,3 +17,12 @@ export {
 } from "./email.service";
 export type { EmailOptions, AlertEmailData, WeeklyReportData, MaintenanceReminderData } from "./email.service";
 export { getWeatherByCoords, getWeatherForInverter } from "./weather.service";
+export { queryRAG, getConversationHistory, clearConversation, classifyAndExtract } from "./rag.service";
+export { runAgentWorkflow } from "./agent.service";
+export { runInputGuardrails, runOutputGuardrails, isJailbreakAttempt, isDomainRelevant } from "./guardrails.service";
+export {
+  getAllMaintenanceTasks, getMaintenanceTaskById, createMaintenanceTask,
+  updateMaintenanceTask, deleteMaintenanceTask, syncAIMaintenanceTasks,
+  getMaintenanceStats,
+} from "./maintenance.service";
+export type { CreateMaintenanceInput, UpdateMaintenanceInput } from "./maintenance.service";

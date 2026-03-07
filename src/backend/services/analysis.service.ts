@@ -14,21 +14,21 @@ import logger from "@/backend/utils/logger";
 /* ── Rule-based fallback ── */
 
 function fallbackRiskAnalysis(inverter: {
-  temperature: number;
+  inverterTemp: number;
   efficiency: number;
   performanceRatio: number;
-  dcVoltage: number;
-  frequency: number;
+  inverterPv1Voltage: number;
+  inverterAlarmCode: number;
 }) {
   let risk = 0;
   const factors: string[] = [];
 
-  if (inverter.temperature > 70) {
+  if (inverter.inverterTemp > 70) {
     risk += 35;
-    factors.push(`CRITICAL: Junction temperature at ${inverter.temperature}°C exceeds safe limits (>70°C).`);
-  } else if (inverter.temperature > 55) {
+    factors.push(`CRITICAL: Junction temperature at ${inverter.inverterTemp}°C exceeds safe limits (>70°C).`);
+  } else if (inverter.inverterTemp > 55) {
     risk += 15;
-    factors.push(`WARNING: Elevated temperature at ${inverter.temperature}°C approaching threshold.`);
+    factors.push(`WARNING: Elevated temperature at ${inverter.inverterTemp}°C approaching threshold.`);
   }
 
   if (inverter.efficiency < 80) {
@@ -47,14 +47,14 @@ function fallbackRiskAnalysis(inverter: {
     factors.push(`WARNING: Performance ratio below optimal at ${inverter.performanceRatio}%.`);
   }
 
-  if (inverter.dcVoltage < 450 || inverter.dcVoltage > 700) {
+  if (inverter.inverterPv1Voltage < 100 || inverter.inverterPv1Voltage > 700) {
     risk += 15;
-    factors.push(`DC voltage at ${inverter.dcVoltage}V outside normal range (450-700V).`);
+    factors.push(`PV1 voltage at ${inverter.inverterPv1Voltage}V outside normal range (100-700V).`);
   }
 
-  if (Math.abs(inverter.frequency - 50) > 0.2) {
+  if (inverter.inverterAlarmCode > 0) {
     risk += 10;
-    factors.push(`Grid frequency deviation: ${inverter.frequency}Hz (nominal: 50Hz).`);
+    factors.push(`Active alarm code: ${inverter.inverterAlarmCode}.`);
   }
 
   const clamped = Math.min(risk, 100);
@@ -118,23 +118,30 @@ export async function analyzeInverter(inverterId: string) {
     capacity_kw: inverter.capacity,
     install_date: inverter.installDate?.toISOString(),
     current_state: {
-      temperature: inverter.temperature,
-      dc_voltage: inverter.dcVoltage,
-      ac_voltage: inverter.acVoltage,
-      frequency: inverter.frequency,
-      power_output: inverter.powerOutput,
+      temperature: inverter.inverterTemp,
+      pv1_voltage: inverter.inverterPv1Voltage,
+      pv1_current: inverter.inverterPv1Current,
+      pv2_voltage: inverter.inverterPv2Voltage,
+      pv2_current: inverter.inverterPv2Current,
+      power_output: inverter.inverterPower,
       efficiency: inverter.efficiency,
       performance_ratio: inverter.performanceRatio,
+      kwh_today: inverter.inverterKwhToday,
+      kwh_total: inverter.inverterKwhTotal,
+      op_state: inverter.inverterOpState,
+      alarm_code: inverter.inverterAlarmCode,
+      ambient_temp: inverter.ambientTemp,
+      meter_active_power: inverter.meterActivePower,
     },
     telemetry_history: telemetry.map((t) => ({
       timestamp: t.timestamp.toISOString(),
-      dc_voltage: t.dcVoltage,
-      ac_voltage: t.acVoltage,
-      current: t.current,
-      temperature: t.temperature,
-      power_output: t.powerOutput,
-      efficiency: t.efficiency,
-      irradiance: t.irradiance,
+      inverter_power: t.inverterPower,
+      pv1_voltage: t.inverterPv1Voltage,
+      pv1_current: t.inverterPv1Current,
+      temperature: t.inverterTemp,
+      kwh_today: t.inverterKwhToday,
+      ambient_temp: t.ambientTemp,
+      alarm_code: t.inverterAlarmCode,
     })),
   };
 
@@ -162,11 +169,11 @@ export async function analyzeInverter(inverterId: string) {
     });
 
     const analysis = fallbackRiskAnalysis({
-      temperature: inverter.temperature,
+      inverterTemp: inverter.inverterTemp,
       efficiency: inverter.efficiency,
       performanceRatio: inverter.performanceRatio,
-      dcVoltage: inverter.dcVoltage,
-      frequency: inverter.frequency,
+      inverterPv1Voltage: inverter.inverterPv1Voltage,
+      inverterAlarmCode: inverter.inverterAlarmCode,
     });
 
     return {

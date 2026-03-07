@@ -15,11 +15,13 @@ export type TranslationKey =
   | "nav.account"
   // Nav items
   | "nav.dashboard"
+  | "nav.plants"
   | "nav.inverters"
   | "nav.analytics"
   | "nav.grid"
   | "nav.maintenance"
   | "nav.aiAdvisor"
+  | "nav.chat"
   | "nav.anomalies"
   | "nav.forecast"
   | "nav.carbon"
@@ -137,11 +139,13 @@ const en: Translations = {
   "nav.ai": "AI FEATURES",
   "nav.account": "ACCOUNT",
   "nav.dashboard": "Dashboard",
+  "nav.plants": "Solar Plants",
   "nav.inverters": "Inverter Fleet",
   "nav.analytics": "Analytics",
   "nav.grid": "DISCOM / Grid",
   "nav.maintenance": "Maintenance",
   "nav.aiAdvisor": "AI Advisor",
+  "nav.chat": "AI Chat",
   "nav.anomalies": "Anomaly Detect",
   "nav.forecast": "Solar Forecast",
   "nav.carbon": "Carbon Impact",
@@ -189,11 +193,13 @@ const hi: Translations = {
   "nav.ai": "AI सुविधाएं",
   "nav.account": "खाता",
   "nav.dashboard": "डैशबोर्ड",
+  "nav.plants": "सौर संयंत्र",
   "nav.inverters": "इन्वर्टर फ्लीट",
   "nav.analytics": "विश्लेषण",
   "nav.grid": "डिस्कॉम / ग्रिड",
   "nav.maintenance": "रखरखाव",
   "nav.aiAdvisor": "AI सलाहकार",
+  "nav.chat": "AI चैट",
   "nav.anomalies": "विसंगति पहचान",
   "nav.forecast": "सौर पूर्वानुमान",
   "nav.carbon": "कार्बन प्रभाव",
@@ -241,11 +247,13 @@ const es: Translations = {
   "nav.ai": "FUNCIONES IA",
   "nav.account": "CUENTA",
   "nav.dashboard": "Panel",
+  "nav.plants": "Plantas Solares",
   "nav.inverters": "Flota de Inversores",
   "nav.analytics": "Analítica",
   "nav.grid": "DISCOM / Red",
   "nav.maintenance": "Mantenimiento",
   "nav.aiAdvisor": "Asesor IA",
+  "nav.chat": "Chat IA",
   "nav.anomalies": "Detectar Anomalías",
   "nav.forecast": "Pronóstico Solar",
   "nav.carbon": "Impacto de Carbono",
@@ -293,11 +301,13 @@ const fr: Translations = {
   "nav.ai": "FONCTIONS IA",
   "nav.account": "COMPTE",
   "nav.dashboard": "Tableau de bord",
+  "nav.plants": "Centrales Solaires",
   "nav.inverters": "Parc Onduleurs",
   "nav.analytics": "Analytique",
   "nav.grid": "DISCOM / Réseau",
   "nav.maintenance": "Maintenance",
   "nav.aiAdvisor": "Conseiller IA",
+  "nav.chat": "Chat IA",
   "nav.anomalies": "Détection d'anomalies",
   "nav.forecast": "Prévision Solaire",
   "nav.carbon": "Impact Carbone",
@@ -344,9 +354,9 @@ const fr: Translations = {
 const de: Partial<Translations> = {
   "nav.overview": "ÜBERSICHT", "nav.fleet": "FLOTTENMANAGEMENT",
   "nav.ai": "KI-FUNKTIONEN", "nav.account": "KONTO",
-  "nav.dashboard": "Dashboard", "nav.inverters": "Wechselrichterflotte",
+  "nav.dashboard": "Dashboard", "nav.plants": "Solaranlagen", "nav.inverters": "Wechselrichterflotte",
   "nav.analytics": "Analytik", "nav.grid": "DISCOM / Netz",
-  "nav.maintenance": "Wartung", "nav.aiAdvisor": "KI-Berater",
+  "nav.maintenance": "Wartung", "nav.aiAdvisor": "KI-Berater", "nav.chat": "KI-Chat",
   "nav.anomalies": "Anomalieerkennung", "nav.forecast": "Solarprognose",
   "nav.carbon": "CO₂-Auswirkung", "nav.settings": "Einstellungen",
   "header.title": "Betriebsdashboard", "header.subtitle": "Echtzeit-Wechselrichterflotten-Intelligenz",
@@ -362,9 +372,9 @@ const de: Partial<Translations> = {
 
 const zh: Partial<Translations> = {
   "nav.overview": "概览", "nav.fleet": "机队管理", "nav.ai": "AI功能", "nav.account": "账户",
-  "nav.dashboard": "仪表板", "nav.inverters": "逆变器机队",
+  "nav.dashboard": "仪表板", "nav.plants": "太阳能电站", "nav.inverters": "逆变器机队",
   "nav.analytics": "分析", "nav.grid": "配电网", "nav.maintenance": "维护",
-  "nav.aiAdvisor": "AI顾问", "nav.anomalies": "异常检测",
+  "nav.aiAdvisor": "AI顾问", "nav.chat": "AI聊天", "nav.anomalies": "异常检测",
   "nav.forecast": "太阳能预测", "nav.carbon": "碳排放影响", "nav.settings": "设置",
   "header.title": "运营控制台", "header.subtitle": "实时逆变器机队智能",
   "header.allSystems": "所有系统运行正常",
@@ -377,9 +387,9 @@ const zh: Partial<Translations> = {
 
 const ja: Partial<Translations> = {
   "nav.overview": "概要", "nav.fleet": "フリート管理", "nav.ai": "AI機能", "nav.account": "アカウント",
-  "nav.dashboard": "ダッシュボード", "nav.inverters": "インバーターフリート",
+  "nav.dashboard": "ダッシュボード", "nav.plants": "太陽光発電所", "nav.inverters": "インバーターフリート",
   "nav.analytics": "アナリティクス", "nav.grid": "グリッド",
-  "nav.maintenance": "メンテナンス", "nav.aiAdvisor": "AIアドバイザー",
+  "nav.maintenance": "メンテナンス", "nav.aiAdvisor": "AIアドバイザー", "nav.chat": "AIチャット",
   "nav.anomalies": "異常検知", "nav.forecast": "太陽光予測",
   "nav.carbon": "炭素影響", "nav.settings": "設定",
   "header.title": "運用ダッシュボード", "header.subtitle": "リアルタイムインバーターフリートインテリジェンス",

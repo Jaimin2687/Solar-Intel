@@ -56,7 +56,7 @@ export function TrendChart({ data }: TrendChartProps) {
             data={chartData}
             index="date"
             categories={["Actual PR (%)", "Expected PR (%)"]}
-            colors={["violet", "slate"]}
+            colors={["violet", "cyan"]}
             showLegend={true}
             showGridLines={false}
             showAnimation={true}

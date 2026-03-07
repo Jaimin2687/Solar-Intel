@@ -93,7 +93,7 @@ export default function AnalyticsPage() {
                   <CardTitle className="text-sm font-semibold"><TranslatedText text="Monthly Comparison (Year-over-Year)" /></CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <BarChart className="h-64" data={monthlyChart} index="month" categories={["This Year", "Last Year", "Target"]} colors={["emerald", "slate", "violet"]} showLegend showGridLines={false} showAnimation yAxisWidth={50} valueFormatter={(v: number) => `${v} kWh`} />
+                  <BarChart className="h-64" data={monthlyChart} index="month" categories={["This Year", "Last Year", "Target"]} colors={["emerald", "cyan", "violet"]} showLegend showGridLines={false} showAnimation yAxisWidth={50} valueFormatter={(v: number) => `${v} kWh`} />
                 </CardContent>
               </Card>
             </div>
@@ -105,11 +105,11 @@ export default function AnalyticsPage() {
                 </div>
               </CardHeader>
               <CardContent className="flex flex-col items-center">
-                <DonutChart data={donutData} category="value" index="name" colors={["emerald", "slate", "violet"]} className="h-48" showAnimation valueFormatter={(v: number) => `${v}%`} />
+                <DonutChart data={donutData} category="value" index="name" colors={["emerald", "cyan", "amber"]} className="h-48" showAnimation valueFormatter={(v: number) => `${v}%`} />
                 <div className="mt-4 flex gap-4">
                   {donutData.map((d, i) => (
                     <div key={d.name} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <div className={cn("h-2 w-2 rounded-full", i === 0 ? "bg-emerald-500" : i === 1 ? "bg-slate-500" : "bg-violet-500")} />
+                      <div className={cn("h-2 w-2 rounded-full", i === 0 ? "bg-emerald-500" : i === 1 ? "bg-cyan-500" : "bg-amber-500")} />
                       {d.name}: {d.value}%
                     </div>
                   ))}
@@ -173,7 +173,7 @@ export default function AnalyticsPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <AreaChart className="h-64" data={degradChart} index="month" categories={["Actual PR (%)", "Expected PR (%)"]} colors={["rose", "slate"]} showLegend showGridLines={false} showAnimation curveType="monotone" yAxisWidth={45} valueFormatter={(v: number) => `${v.toFixed(2)}%`} />
+                <AreaChart className="h-64" data={degradChart} index="month" categories={["Actual PR (%)", "Expected PR (%)"]} colors={["rose", "cyan"]} showLegend showGridLines={false} showAnimation curveType="monotone" yAxisWidth={45} valueFormatter={(v: number) => `${v.toFixed(2)}%`} />
               </CardContent>
             </Card>
           </motion.div>

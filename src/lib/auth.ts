@@ -9,8 +9,11 @@
 
 import { type NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { connectDB } from "@/backend/config";
 import { User } from "@/backend/models";
+
+const isDev = process.env.NODE_ENV === "development";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -18,6 +21,28 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID ?? "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
     }),
+    // ── Dev-only: skip OAuth for local testing ──
+    ...(isDev
+      ? [
+          CredentialsProvider({
+            id: "dev-login",
+            name: "Dev Login",
+            credentials: {
+              email: { label: "Email", type: "email", placeholder: "dev@solar-intel.local" },
+            },
+            async authorize(credentials) {
+              // Accept any email in dev mode — no password needed
+              const email = credentials?.email || "dev@solar-intel.local";
+              return {
+                id: "dev-user-001",
+                name: "Dev Admin",
+                email,
+                image: "",
+              };
+            },
+          }),
+        ]
+      : []),
   ],
 
   pages: {
@@ -85,11 +110,16 @@ export const authOptions: NextAuthOptions = {
      * Only hits DB on the very first sign-in (account present),
      * afterwards reads cached values from the JWT — zero DB calls.
      */
-    async jwt({ token, account }) {
+    async jwt({ token, account, user }) {
       if (account?.provider === "google") {
         // First sign-in: account carries the values stashed in signIn()
         token.dbUserId = (account as Record<string, unknown>).dbUserId as string || token.sub || "";
         token.role    = (account as Record<string, unknown>).dbRole as string   || "operator";
+      }
+      if (account?.provider === "dev-login" && user) {
+        // Dev login — no DB involved, just set admin role
+        token.dbUserId = user.id || "dev-user-001";
+        token.role = "admin";
       }
       // Subsequent requests: token already has dbUserId + role — no DB hit
       return token;

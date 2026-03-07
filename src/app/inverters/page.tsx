@@ -8,8 +8,9 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSearchParams, useRouter } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
 import { motion, AnimatePresence } from "framer-motion";
 import { pageTransition, staggerContainer, fadeUp } from "@/lib/motion";
@@ -19,11 +20,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { WeatherCard } from "@/components/ui/weather-card";
 import { cn } from "@/lib/utils";
 import { useLang } from "@/lib/i18n/context";
+import { fetchAllPlants, importFile } from "@/lib/api-client";
+import { TranslatedText } from "@/components/ui/translated-text";
 import {
   Plus, Pencil, Trash2, Zap, AlertTriangle, CheckCircle2,
   XCircle, Search, RefreshCw, ChevronUp, ChevronDown,
+  ArrowLeft, Factory, Upload, FileSpreadsheet,
 } from "lucide-react";
-import type { Inverter } from "@/types";
+import type { Inverter, Plant } from "@/types";
 
 // ── API helpers ───────────────────────────────────────────
 
@@ -81,12 +85,15 @@ const StatusIcon = ({ status }: { status: string }) => {
 
 function blankForm(): Partial<Inverter> {
   return {
-    id: "", name: "", location: "", status: "healthy",
+    id: "", plantId: "", name: "", location: "", status: "healthy",
     model: "", capacity: 0, installDate: new Date().toISOString().split("T")[0],
-    firmware: "", performanceRatio: 0, temperature: 0, powerOutput: 0,
-    riskScore: 0, uptime: 100, dcVoltage: 0, acVoltage: 0,
-    frequency: 50, currentOutput: 0, dailyYield: 0,
-    lifetimeYield: 0, efficiency: 0,
+    firmware: "", performanceRatio: 0, efficiency: 0,
+    riskScore: 0, uptime: 100,
+    inverterPower: 0, inverterPv1Power: 0, inverterPv1Voltage: 0, inverterPv1Current: 0,
+    inverterPv2Power: 0, inverterPv2Voltage: 0, inverterPv2Current: 0,
+    inverterKwhToday: 0, inverterKwhTotal: 0, inverterTemp: 0,
+    inverterOpState: 0, inverterAlarmCode: 0, inverterLimitPercent: 0,
+    ambientTemp: 0, meterActivePower: 0,
   };
 }
 
@@ -136,7 +143,7 @@ function Field({
 // ── Add / Edit dialog ─────────────────────────────────────
 
 function InverterFormDialog({
-  mode, inverter, open, onOpenChange, onSave, isSaving, error,
+  mode, inverter, open, onOpenChange, onSave, isSaving, error, plants,
 }: {
   mode: "add" | "edit";
   inverter: Partial<Inverter>;
@@ -145,6 +152,7 @@ function InverterFormDialog({
   onSave: (data: Partial<Inverter>) => void;
   isSaving: boolean;
   error: string | null;
+  plants?: Plant[];
 }) {
   const [form, setForm] = useState<Partial<Inverter>>(inverter);
   const setField = (name: string, value: string | number) =>
@@ -177,6 +185,26 @@ function InverterFormDialog({
               <Field label="Inverter ID" name="id" value={form.id ?? ""} required
                 onChange={(_, v) => setForm((f) => ({ ...f, id: v as string }))} />
             )}
+            {mode === "add" && plants && plants.length > 0 ? (
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-medium text-muted-foreground">
+                  Plant <span className="text-red-400">*</span>
+                </label>
+                <select
+                  title="Select Plant"
+                  className="w-full rounded-lg border border-white/10 bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  value={form.plantId ?? ""}
+                  onChange={(e) => setForm((f) => ({ ...f, plantId: e.target.value }))}
+                >
+                  <option value="">— Select a plant —</option>
+                  {plants.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name} ({p.id})</option>
+                  ))}
+                </select>
+              </div>
+            ) : mode === "add" ? (
+              <Field label="Plant ID" name="plantId" value={form.plantId ?? ""} required onChange={setField} />
+            ) : null}
             <Field label="Name"        name="name"     value={form.name ?? ""}     required onChange={setField} />
             <Field label="Location"    name="location" value={form.location ?? ""} required onChange={setField} />
             <Field label="Status"      name="status"   value={form.status ?? "healthy"}
@@ -185,18 +213,25 @@ function InverterFormDialog({
             <Field label="Capacity (kW)"    name="capacity"    type="number" value={form.capacity ?? 0}    required onChange={setField} />
             <Field label="Install Date"     name="installDate" type="date"   value={form.installDate ?? ""} required onChange={setField} />
             <Field label="Firmware"         name="firmware"    value={form.firmware ?? ""}   onChange={setField} />
-            <Field label="DC Voltage (V)"   name="dcVoltage"   type="number" value={form.dcVoltage ?? 0}   onChange={setField} />
-            <Field label="AC Voltage (V)"   name="acVoltage"   type="number" value={form.acVoltage ?? 0}   onChange={setField} />
-            <Field label="Frequency (Hz)"   name="frequency"   type="number" value={form.frequency ?? 50}  onChange={setField} />
-            <Field label="Current Output (A)" name="currentOutput" type="number" value={form.currentOutput ?? 0} onChange={setField} />
-            <Field label="Power Output (kW)"  name="powerOutput"  type="number" value={form.powerOutput ?? 0}  onChange={setField} />
+            <Field label="Inverter Power (W)"     name="inverterPower"     type="number" value={form.inverterPower ?? 0}     onChange={setField} />
+            <Field label="PV1 Power (W)"          name="inverterPv1Power"  type="number" value={form.inverterPv1Power ?? 0}  onChange={setField} />
+            <Field label="PV1 Voltage (V)"        name="inverterPv1Voltage" type="number" value={form.inverterPv1Voltage ?? 0} onChange={setField} />
+            <Field label="PV1 Current (A)"        name="inverterPv1Current" type="number" value={form.inverterPv1Current ?? 0} onChange={setField} />
+            <Field label="PV2 Power (W)"          name="inverterPv2Power"  type="number" value={form.inverterPv2Power ?? 0}  onChange={setField} />
+            <Field label="PV2 Voltage (V)"        name="inverterPv2Voltage" type="number" value={form.inverterPv2Voltage ?? 0} onChange={setField} />
+            <Field label="PV2 Current (A)"        name="inverterPv2Current" type="number" value={form.inverterPv2Current ?? 0} onChange={setField} />
+            <Field label="kWh Today"               name="inverterKwhToday"  type="number" value={form.inverterKwhToday ?? 0}  onChange={setField} />
+            <Field label="kWh Total"               name="inverterKwhTotal"  type="number" value={form.inverterKwhTotal ?? 0}  onChange={setField} />
+            <Field label="Temperature (°C)"        name="inverterTemp"      type="number" value={form.inverterTemp ?? 0}      onChange={setField} />
+            <Field label="Op State"                name="inverterOpState"   type="number" value={form.inverterOpState ?? 0}   onChange={setField} />
+            <Field label="Alarm Code"              name="inverterAlarmCode" type="number" value={form.inverterAlarmCode ?? 0} onChange={setField} />
+            <Field label="Limit %"                 name="inverterLimitPercent" type="number" value={form.inverterLimitPercent ?? 0} onChange={setField} />
+            <Field label="Ambient Temp (°C)"       name="ambientTemp"       type="number" value={form.ambientTemp ?? 0}       onChange={setField} />
+            <Field label="Meter Active Power (kW)" name="meterActivePower"  type="number" value={form.meterActivePower ?? 0}  onChange={setField} />
             <Field label="Performance Ratio (%)" name="performanceRatio" type="number" value={form.performanceRatio ?? 0} onChange={setField} />
             <Field label="Efficiency (%)"  name="efficiency"  type="number" value={form.efficiency ?? 0}  onChange={setField} />
             <Field label="Uptime (%)"      name="uptime"      type="number" value={form.uptime ?? 100}     onChange={setField} />
-            <Field label="Temperature (°C)" name="temperature" type="number" value={form.temperature ?? 0} onChange={setField} />
             <Field label="Risk Score (0–100)" name="riskScore" type="number" value={form.riskScore ?? 0}   onChange={setField} />
-            <Field label="Daily Yield (kWh)"   name="dailyYield"    type="number" value={form.dailyYield ?? 0}    onChange={setField} />
-            <Field label="Lifetime Yield (MWh)" name="lifetimeYield" type="number" value={form.lifetimeYield ?? 0} onChange={setField} />
           </div>
 
           <div className="mt-6 flex justify-end gap-3">
@@ -282,12 +317,59 @@ function sortInverters(list: Inverter[], key: SortKey, dir: "asc" | "desc") {
 export default function InvertersPage() {
   const qc = useQueryClient();
   const { t } = useLang();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const plantIdFilter = searchParams.get("plantId");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<string | null>(null);
 
   const { data: inverters = [], isLoading } = useQuery({
     queryKey: ["inverters"],
     queryFn: fetchInverters,
     refetchInterval: 30_000,
   });
+
+  // Fetch plants for breadcrumb plant name lookup + Add Inverter plant dropdown
+  const { data: plants = [] } = useQuery<Plant[]>({
+    queryKey: ["plants"],
+    queryFn: fetchAllPlants,
+  });
+
+  const activePlant = plantIdFilter ? plants.find((p) => p.id === plantIdFilter) : null;
+
+  // ── Import handler
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImporting(true);
+    setImportResult(null);
+
+    try {
+      const result = await importFile(file, "inverter");
+      setImportResult(
+        `Success! Imported ${result.invertersCreated} inverter(s).` +
+        (result.plantsCreated > 0 ? ` Also created ${result.plantsCreated} plant(s).` : "") +
+        (result.warnings.length > 0 ? ` Warnings: ${result.warnings.join(", ")}` : "") +
+        (result.errors.length > 0 ? ` Errors: ${result.errors.join(", ")}` : "")
+      );
+      qc.invalidateQueries({ queryKey: ["inverters"] });
+      qc.invalidateQueries({ queryKey: ["plants"] });
+      qc.invalidateQueries({ queryKey: ["dashboard"] });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Unknown error";
+      setImportResult(`Error: ${msg}`);
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  // Filter inverters by plantId when query param is present
+  const plantFiltered = plantIdFilter
+    ? inverters.filter((inv) => inv.plantId === plantIdFilter)
+    : inverters;
 
   // ── Dialog state
   const [addOpen,    setAddOpen]    = useState(false);
@@ -307,7 +389,7 @@ export default function InvertersPage() {
   };
 
   const filtered = sortInverters(
-    inverters.filter(
+    plantFiltered.filter(
       (inv) =>
         inv.id.toLowerCase().includes(search.toLowerCase()) ||
         inv.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -319,8 +401,8 @@ export default function InvertersPage() {
 
   // ── Mutations
   const createMutation = useMutation({
-    mutationFn: (data: Partial<Inverter>) => apiCreateInverter(data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["inverters"] }); setAddOpen(false);   setFormError(null); },
+    mutationFn: (data: Partial<Inverter>) => apiCreateInverter({ ...data, inverterId: data.id } as any),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["inverters"] }); qc.invalidateQueries({ queryKey: ["plants"] }); setAddOpen(false); setFormError(null); },
     onError:   (err: Error) => setFormError(err.message),
   });
 
@@ -337,10 +419,10 @@ export default function InvertersPage() {
   });
 
   // ── Summary stats
-  const healthy  = inverters.filter((i) => i.status === "healthy").length;
-  const warning  = inverters.filter((i) => i.status === "warning").length;
-  const critical = inverters.filter((i) => i.status === "critical").length;
-  const totalKW  = inverters.reduce((s, i) => s + (i.powerOutput || 0), 0);
+  const healthy  = plantFiltered.filter((i) => i.status === "healthy").length;
+  const warning  = plantFiltered.filter((i) => i.status === "warning").length;
+  const critical = plantFiltered.filter((i) => i.status === "critical").length;
+  const totalKW  = plantFiltered.reduce((s, i) => s + (i.powerOutput || 0), 0);
 
   const SortIcon = ({ col }: { col: SortKey }) =>
     sortKey === col ? (
@@ -351,26 +433,94 @@ export default function InvertersPage() {
 
   return (
     <motion.div {...pageTransition} className="mx-auto max-w-[1440px] space-y-6">
+      {/* Breadcrumb for plant filter */}
+      {plantIdFilter && (
+        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 text-sm">
+          <a href="/plants" title="Back to Solar Plants" className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="h-4 w-4" />
+            <Factory className="h-4 w-4" />
+            <span><TranslatedText text="Solar Plants" /></span>
+          </a>
+          <span className="text-muted-foreground/50">/</span>
+          <span className="font-medium text-purple-400">{activePlant?.name || plantIdFilter}</span>
+          <span className="text-muted-foreground/50">/</span>
+          <span className="text-foreground"><TranslatedText text="Inverters" /></span>
+          <button
+            title="Show all inverters"
+            onClick={() => router.push("/inverters")}
+            className="ml-auto flex items-center gap-1.5 rounded-lg border border-border/50 bg-muted/50 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:border-border transition-colors"
+          >
+            <XCircle className="h-3 w-3" />
+            <TranslatedText text="Show All Inverters" />
+          </button>
+        </motion.div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">{t("inverters.title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("inverters.subtitle")}</p>
+          <h1 className="text-2xl font-bold text-foreground">
+            {plantIdFilter && activePlant ? activePlant.name : t("inverters.title")}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {plantIdFilter
+              ? `${plantFiltered.length} inverter(s) in this plant`
+              : t("inverters.subtitle")}
+          </p>
         </div>
         <div className="flex flex-col gap-3 sm:items-end">
           {/* Weather for first inverter in fleet */}
-          {inverters.length > 0 && (
-            <WeatherCard inverterId={inverters[0].id} compact className="sm:w-auto" />
+          {plantFiltered.length > 0 && (
+            <WeatherCard inverterId={plantFiltered[0].id} compact className="sm:w-auto" />
           )}
-          <Button
-            onClick={() => { setFormError(null); setAddOpen(true); }}
-            className="gap-2 self-start sm:self-auto"
-          >
-            <Plus className="h-4 w-4" />
-            {t("inverters.addInverter")}
-          </Button>
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv,.xlsx,.xls"
+              onChange={handleImport}
+              title="Upload CSV or Excel file"
+              className="hidden"
+            />
+            <Button
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={importing}
+              className="gap-2"
+            >
+              {importing ? (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              ) : (
+                <Upload className="h-4 w-4" />
+              )}
+              <TranslatedText text="Import CSV / Excel" />
+            </Button>
+            <Button
+              onClick={() => { setFormError(null); setAddOpen(true); }}
+              className="gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              {t("inverters.addInverter")}
+            </Button>
+          </div>
         </div>
       </div>
+
+      {/* Import Result */}
+      {importResult && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`rounded-lg border p-3 text-sm ${
+            importResult.startsWith("Error")
+              ? "border-red-500/30 bg-red-500/10 text-red-400"
+              : "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+          }`}
+        >
+          <FileSpreadsheet className="inline h-4 w-4 mr-2" />
+          {importResult}
+        </motion.div>
+      )}
 
       {/* Summary cards */}
       <motion.div
@@ -378,7 +528,7 @@ export default function InvertersPage() {
         className="grid grid-cols-2 gap-4 lg:grid-cols-4"
       >
         {[
-          { label: t("inverters.total"),  value: inverters.length, icon: Zap,          color: "text-blue-400"    },
+          { label: t("inverters.total"),  value: plantFiltered.length, icon: Zap,          color: "text-blue-400"    },
           { label: t("common.healthy"),   value: healthy,           icon: CheckCircle2, color: "text-emerald-400" },
           { label: t("common.warning"),   value: warning,           icon: AlertTriangle, color: "text-amber-400"  },
           { label: t("common.critical"),  value: critical,          icon: XCircle,      color: "text-red-400"     },
@@ -401,7 +551,7 @@ export default function InvertersPage() {
       <Card className="border-white/5 bg-card/50">
         <CardHeader className="flex flex-row items-center justify-between pb-3">
           <CardTitle className="text-base font-semibold">
-            {t("inverters.allInverters")}
+            {plantIdFilter && activePlant ? activePlant.name + " — Inverters" : t("inverters.allInverters")}
             <span className="ml-2 text-sm font-normal text-muted-foreground">
               — {totalKW.toFixed(1)} kW total output
             </span>
@@ -455,6 +605,7 @@ export default function InvertersPage() {
                         </span>
                       </th>
                     ))}
+                    <th className="px-4 py-3 font-medium text-left">Reason</th>
                     <th className="px-4 py-3 font-medium">Actions</th>
                   </tr>
                 </thead>
@@ -482,7 +633,7 @@ export default function InvertersPage() {
                           </span>
                         </td>
                         <td className="px-4 py-3 text-muted-foreground">{inv.capacity} kW</td>
-                        <td className="px-4 py-3 text-foreground">{inv.powerOutput.toFixed(1)} kW</td>
+                        <td className="px-4 py-3 text-foreground">{(inv.powerOutput ?? 0).toFixed(1)} kW</td>
                         <td className="px-4 py-3">
                           <span className={cn(
                             "font-medium",
@@ -490,6 +641,15 @@ export default function InvertersPage() {
                             inv.riskScore >= 40 ? "text-amber-400" : "text-emerald-400"
                           )}>
                             {inv.riskScore}
+                          </span>
+                        </td>
+                        <td className="max-w-[220px] px-4 py-3">
+                          <span className={cn(
+                            "text-xs leading-tight",
+                            inv.status === "critical" ? "text-red-300" :
+                            inv.status === "warning" ? "text-amber-300" : "text-muted-foreground"
+                          )}>
+                            {inv.statusReason || "—"}
                           </span>
                         </td>
                         <td className="px-4 py-3">
@@ -530,6 +690,7 @@ export default function InvertersPage() {
         onSave={(data) => createMutation.mutate(data)}
         isSaving={createMutation.isPending}
         error={formError}
+        plants={plants}
       />
 
       {/* ── Edit dialog ── */}

@@ -1,12 +1,16 @@
 /**
  * ─────────────────────────────────────────────────────────
- * Solar Intel — Backend: ML Prediction Service
+ * Solar Intel — Backend: ML Prediction Service (v4)
  * ─────────────────────────────────────────────────────────
- * Calls the Python ML microservice (FastAPI) to get real
- * XGBoost failure predictions for each inverter.
+ * Calls the Python ML microservice's /predict/fleet endpoint.
  *
- * Maps MongoDB inverter docs → ML input format → returns
- * per-inverter risk scores + factors + recommendations.
+ * v4: The Python service now pulls telemetry history from
+ * MongoDB directly and runs the FULL training pipeline
+ * (log transforms, per-inverter z-score normalisation,
+ * proper lag/rolling features). This produces real varied
+ * predictions instead of the uniform ~0.97 from snapshot data.
+ *
+ * All we need to send is a list of inverter IDs.
  * ─────────────────────────────────────────────────────────
  */
 
@@ -31,65 +35,42 @@ interface MLBatchResponse {
 }
 
 /**
- * Map a MongoDB inverter document to the ML model's input schema.
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function inverterToMLInput(inv: any) {
-  const hour = new Date().getHours();
-  return {
-    plant_id: "Plant_1",
-    inverter_id: inv.inverterId,
-    mean_power: inv.powerOutput * 1000,        // kW → Watts (model trained on Watts)
-    std_power: inv.powerOutput * 1000 * 0.08,  // ~8% std dev estimate
-    max_power: inv.powerOutput * 1000 * 1.15,
-    min_power: inv.powerOutput * 1000 * 0.85,
-    mean_temp: inv.temperature,
-    max_temp: inv.temperature + 5,
-    mean_voltage: inv.dcVoltage || 600,
-    mean_current: inv.currentOutput || 10,
-    ambient_temp: Math.max(inv.temperature - 15, 25),
-    alarm_count: inv.riskScore > 70 ? 1 : 0,
-    hour,
-    grid_freq: inv.frequency || 50.0,
-    power_factor: 0.98,
-    kwh_today: inv.dailyYield || 0,
-    kwh_total: inv.lifetimeYield * 1000 || 500000,  // MWh → kWh
-    op_state: inv.powerOutput > 0 ? 5120 : 0,
-    n_strings: (inv.strings || []).length || 9,
-    current_imbalance: 0.05,
-    voltage_imbalance: 0.01,
-    power_ramp: 0,
-  };
-}
-
-/**
- * Call the ML microservice for batch predictions.
- * Returns predictions for all inverters, or null if service is unavailable.
+ * Call the ML microservice's /predict/fleet endpoint.
+ * v4: Just send inverter IDs — Python pulls telemetry from MongoDB
+ * and runs the full training-pipeline preprocessing.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getMLPredictions(dbInverters: any[]): Promise<MLPrediction[] | null> {
   const mlUrl = env.ML_SERVICE_URL.replace("/predict", "");
 
   try {
-    const inputs = dbInverters.map(inverterToMLInput);
+    const inverterIds = dbInverters.map((inv: any) => inv.inverterId).filter(Boolean);
 
-    const res = await fetch(`${mlUrl}/predict/batch`, {
+    if (inverterIds.length === 0) {
+      logger.warn("No inverter IDs to send to ML service");
+      return null;
+    }
+
+    const res = await fetch(`${mlUrl}/predict/fleet`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ inverters: inputs }),
+      body: JSON.stringify({ inverter_ids: inverterIds }),
       signal: AbortSignal.timeout(env.ML_TIMEOUT_MS),
     });
 
     if (!res.ok) {
-      logger.error("ML service error", { status: res.status, body: await res.text() });
+      logger.error("ML fleet service error", { status: res.status, body: await res.text() });
       return null;
     }
 
     const data: MLBatchResponse = await res.json();
-    logger.info("ML predictions received", {
+    logger.info("ML fleet predictions received", {
       count: data.predictions.length,
       model: data.model_version,
       timestamp: data.timestamp,
+      riskRange: data.predictions.length > 0
+        ? `${Math.min(...data.predictions.map(p => p.risk_score)).toFixed(4)}–${Math.max(...data.predictions.map(p => p.risk_score)).toFixed(4)}`
+        : "N/A",
     });
 
     return data.predictions;
@@ -103,25 +84,10 @@ export async function getMLPredictions(dbInverters: any[]): Promise<MLPrediction
 }
 
 /**
- * Get a single inverter prediction.
+ * Get a single inverter prediction using fleet endpoint.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getMLPredictionSingle(inv: any): Promise<MLPrediction | null> {
-  const mlUrl = env.ML_SERVICE_URL.replace("/predict", "");
-
-  try {
-    const input = inverterToMLInput(inv);
-
-    const res = await fetch(`${mlUrl}/predict`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(input),
-      signal: AbortSignal.timeout(env.ML_TIMEOUT_MS),
-    });
-
-    if (!res.ok) return null;
-    return await res.json();
-  } catch {
-    return null;
-  }
+  const preds = await getMLPredictions([inv]);
+  return preds && preds.length > 0 ? preds[0] : null;
 }

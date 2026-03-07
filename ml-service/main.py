@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field
 from typing import Optional, List
 import time
 
-from predict import predict_failure, predict_batch
+from predict import predict_failure, predict_batch, predict_fleet
 
 app = FastAPI(
     title="Solar Intel ML Service",
@@ -84,6 +84,11 @@ class BatchResponse(BaseModel):
     model_version: str = "1.0.0"
 
 
+class FleetRequest(BaseModel):
+    """Request for fleet prediction — just pass inverter IDs, Python pulls telemetry from MongoDB."""
+    inverter_ids: List[str]
+
+
 # ─────────────────────────────────────────────────────────────
 # Endpoints
 # ─────────────────────────────────────────────────────────────
@@ -136,6 +141,37 @@ def batch_predict(req: BatchRequest):
         return BatchResponse(
             predictions=predictions,
             timestamp=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/predict/fleet", response_model=BatchResponse)
+def fleet_predict(req: FleetRequest):
+    """
+    Predict failure risk for a fleet of inverters using FULL training pipeline.
+    Pulls telemetry history from MongoDB, computes proper lag/rolling features,
+    per-inverter z-score normalisation — exactly like the model was trained.
+    """
+    try:
+        results = predict_fleet(req.inverter_ids)
+        predictions = [
+            PredictionOutput(
+                inverter_id=r["inverter_id"],
+                plant_id=r["plant_id"],
+                risk_score=r["risk_score"],
+                risk_level=r["risk_level"],
+                failure_predicted=r["failure_predicted"],
+                status=r["status"],
+                top_factors=r["top_factors"],
+                recommended_action=r["recommended_action"],
+            )
+            for r in results
+        ]
+        return BatchResponse(
+            predictions=predictions,
+            timestamp=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            model_version="4.0.0",
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

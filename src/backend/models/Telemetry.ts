@@ -3,46 +3,57 @@
  * Solar Intel — Backend: Telemetry Record Model (Mongoose)
  * ─────────────────────────────────────────────────────────
  * Time-series telemetry data linked to an inverter.
+ * Field names align with master_refined.csv columns.
  */
 
 import mongoose, { Schema, type Document, type Model } from "mongoose";
 
 export interface ITelemetryRecord extends Document {
   inverterId: string;
+  plantId: string;
   timestamp: Date;
-  dcVoltage: number;
-  acVoltage: number;
-  current: number;
-  temperature: number;
-  frequency: number;
-  powerOutput: number;
-  efficiency: number;
-  performanceRatio: number;
-  irradiance: number;
-  ambientTemp: number;
-  dailyYield: number;
-  stringVoltages: number[];
-  stringCurrents: number[];
+
+  /* ── Raw sensor data (matches CSV columns) ── */
+  inverterPower: number;       // AC power output (W)
+  inverterPv1Power: number;    // PV string 1 power (W)
+  inverterPv1Voltage: number;  // PV string 1 voltage (V)
+  inverterPv1Current: number;  // PV string 1 current (A)
+  inverterPv2Power: number;    // PV string 2 power (W)
+  inverterPv2Voltage: number;  // PV string 2 voltage (V)
+  inverterPv2Current: number;  // PV string 2 current (A)
+  inverterKwhToday: number;    // Daily energy yield (kWh)
+  inverterKwhTotal: number;    // Lifetime energy yield (kWh)
+  inverterTemp: number;        // Inverter temperature (C)
+  inverterOpState: number;     // Operating state code
+  inverterAlarmCode: number;   // Alarm code
+  inverterLimitPercent: number;// Power limit percentage
+  ambientTemp: number;         // Ambient temperature (C)
+  meterActivePower: number;    // Grid meter active power (kW)
+
   createdAt: Date;
 }
 
 const TelemetryRecordSchema = new Schema<ITelemetryRecord>(
   {
     inverterId: { type: String, required: true, index: true },
+    plantId: { type: String, default: "" },
     timestamp: { type: Date, required: true },
-    dcVoltage: { type: Number, required: true },
-    acVoltage: { type: Number, required: true },
-    current: { type: Number, required: true },
-    temperature: { type: Number, required: true },
-    frequency: { type: Number, default: 50 },
-    powerOutput: { type: Number, required: true },
-    efficiency: { type: Number, default: 0 },
-    performanceRatio: { type: Number, default: 0 },
-    irradiance: { type: Number, default: 0 },
+
+    inverterPower: { type: Number, default: 0 },
+    inverterPv1Power: { type: Number, default: 0 },
+    inverterPv1Voltage: { type: Number, default: 0 },
+    inverterPv1Current: { type: Number, default: 0 },
+    inverterPv2Power: { type: Number, default: 0 },
+    inverterPv2Voltage: { type: Number, default: 0 },
+    inverterPv2Current: { type: Number, default: 0 },
+    inverterKwhToday: { type: Number, default: 0 },
+    inverterKwhTotal: { type: Number, default: 0 },
+    inverterTemp: { type: Number, default: 0 },
+    inverterOpState: { type: Number, default: 0 },
+    inverterAlarmCode: { type: Number, default: 0 },
+    inverterLimitPercent: { type: Number, default: 0 },
     ambientTemp: { type: Number, default: 0 },
-    dailyYield: { type: Number, default: 0 },
-    stringVoltages: [{ type: Number }],
-    stringCurrents: [{ type: Number }],
+    meterActivePower: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

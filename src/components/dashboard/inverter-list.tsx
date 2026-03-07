@@ -81,9 +81,9 @@ export function InverterList({ inverters }: InverterListProps) {
           </div>
         </CardHeader>
         <CardContent className="px-0 pb-0">
-          <div className="overflow-x-auto">
+          <div className="scroll-thin max-h-[420px] overflow-y-auto overflow-x-auto">
             <Table>
-              <TableHeader>
+              <TableHeader className="sticky top-0 z-10 bg-card">
                 <TableRow className="border-border/50 hover:bg-transparent">
                   {(["Inverter","Status","Performance","Temp","Output","Risk","Updated"] as const).map((col) => (
                     <TableHead key={col} className={cn("text-[11px] font-semibold uppercase tracking-wider text-muted-foreground", col === "Inverter" && "pl-6", col === "Updated" && "pr-6 text-right")}>

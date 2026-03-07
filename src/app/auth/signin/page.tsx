@@ -74,11 +74,17 @@ export default function SignInPage() {
                   key={provider.id}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => signIn(provider.id, { callbackUrl: "/" })}
-                  className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl
-                    bg-white text-gray-900 font-semibold text-sm
-                    hover:bg-gray-100 transition-colors duration-200
-                    shadow-lg shadow-white/10"
+                  onClick={() =>
+                    provider.id === "dev-login"
+                      ? signIn("dev-login", { callbackUrl: "/", email: "dev@solar-intel.local" })
+                      : signIn(provider.id, { callbackUrl: "/" })
+                  }
+                  className={`w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl
+                    font-semibold text-sm shadow-lg transition-colors duration-200
+                    ${provider.id === "dev-login"
+                      ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-500 hover:to-indigo-500 shadow-purple-500/20"
+                      : "bg-white text-gray-900 hover:bg-gray-100 shadow-white/10"
+                    }`}
                 >
                   {/* Google icon */}
                   {provider.id === "google" && (
@@ -89,7 +95,11 @@ export default function SignInPage() {
                       <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                     </svg>
                   )}
-                  Continue with {provider.name}
+                  {/* Dev icon */}
+                  {provider.id === "dev-login" && (
+                    <Zap className="w-5 h-5 text-amber-300" />
+                  )}
+                  {provider.id === "dev-login" ? "Dev Login (Skip Auth)" : `Continue with ${provider.name}`}
                 </motion.button>
               ))
             ) : (

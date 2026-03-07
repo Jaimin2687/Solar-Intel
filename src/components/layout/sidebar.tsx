@@ -25,6 +25,8 @@ import {
   Wrench,
   Leaf,
   AlertTriangle,
+  Factory,
+  MessageSquare,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +37,7 @@ const navSections = [
     labelKey: "nav.overview" as TranslationKey,
     items: [
       { href: "/", labelKey: "nav.dashboard" as TranslationKey, icon: LayoutDashboard },
+      { href: "/plants", labelKey: "nav.plants" as TranslationKey, icon: Factory, isNew: true },
       { href: "/inverters", labelKey: "nav.inverters" as TranslationKey, icon: Radio, dot: true },
     ],
   },
@@ -50,6 +53,7 @@ const navSections = [
     labelKey: "nav.ai" as TranslationKey,
     items: [
       { href: "/ai-insights", labelKey: "nav.aiAdvisor" as TranslationKey, icon: Brain, isNew: true },
+      { href: "/chat", labelKey: "nav.chat" as TranslationKey, icon: MessageSquare, isNew: true },
       { href: "/anomalies", labelKey: "nav.anomalies" as TranslationKey, icon: AlertTriangle, isNew: true },
       { href: "/forecast", labelKey: "nav.forecast" as TranslationKey, icon: Sun, isNew: true },
       { href: "/carbon", labelKey: "nav.carbon" as TranslationKey, icon: Leaf, isNew: true },

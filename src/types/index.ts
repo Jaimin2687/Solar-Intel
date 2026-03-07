@@ -9,30 +9,68 @@ export type InverterStatus = "healthy" | "warning" | "critical";
 export type RiskLevel = "low" | "medium" | "high" | "critical";
 export type MaintenanceStatus = "scheduled" | "in-progress" | "completed" | "overdue";
 export type AnomalySeverity = "info" | "warning" | "critical";
+export type PlantStatus = "active" | "maintenance" | "offline";
+
+/* ── Plant ── */
+export interface Plant {
+  id: string;
+  name: string;
+  location: string;
+  latitude: number;
+  longitude: number;
+  capacity: number; // MW
+  area: number; // hectares
+  commissionDate: string;
+  status: PlantStatus;
+  inverterCount: number;
+  description: string;
+  // Aggregated metrics (computed at runtime)
+  totalPower?: number;
+  avgPerformance?: number;
+  healthScore?: number;
+  riskLevel?: RiskLevel;
+}
 
 /* ── Inverter ── */
 export interface Inverter {
   id: string;
+  plantId: string;
   name: string;
   location: string;
   status: InverterStatus;
-  performanceRatio: number;
-  temperature: number;
-  powerOutput: number;
   riskScore: number;
   lastUpdated: string;
+  statusReason: string; // why the inverter is in its current status
+
+  /* ── Real telemetry fields (match CSV / ML model inputs) ── */
+  inverterPower: number;       // AC power output (W)
+  inverterPv1Power: number;    // PV string 1 power (W)
+  inverterPv1Voltage: number;  // PV string 1 voltage (V)
+  inverterPv1Current: number;  // PV string 1 current (A)
+  inverterPv2Power: number;    // PV string 2 power (W)
+  inverterPv2Voltage: number;  // PV string 2 voltage (V)
+  inverterPv2Current: number;  // PV string 2 current (A)
+  inverterKwhToday: number;    // Daily energy yield (kWh)
+  inverterKwhTotal: number;    // Lifetime energy yield (kWh)
+  inverterTemp: number;        // Inverter temperature (C)
+  inverterOpState: number;     // Operating state code
+  inverterAlarmCode: number;   // Alarm code
+  inverterLimitPercent: number;// Power limit percentage
+  ambientTemp: number;         // Ambient temperature (C)
+  meterActivePower: number;    // Grid meter active power (kW)
+
+  /* ── Derived / display fields ── */
+  performanceRatio: number;
+  powerOutput: number;         // Alias: inverterPower in kW for display
+  temperature: number;         // Alias: inverterTemp
   uptime: number;
   model: string;
   capacity: number; // kW rated
   installDate: string;
   firmware: string;
-  dcVoltage: number;
-  acVoltage: number;
-  frequency: number;
-  currentOutput: number; // Amps
-  dailyYield: number; // kWh
-  lifetimeYield: number; // MWh
   efficiency: number; // percentage
+  dailyYield: number;   // kWh (alias for inverterKwhToday)
+  lifetimeYield: number; // MWh
   strings: InverterString[];
 }
 
@@ -306,3 +344,47 @@ export interface NotificationPref {
   weeklyReport: boolean;
   maintenanceReminders: boolean;
 }
+
+/* ── Chat / RAG ── */
+export interface ChatMessage {
+  id: string;
+  role: "user" | "assistant" | "system";
+  content: string;
+  timestamp: string;
+  sources?: ChatSource[];
+  agentAction?: AgentAction;
+}
+
+export interface ChatSource {
+  type: "inverter" | "plant" | "telemetry" | "ml-prediction";
+  id: string;
+  name: string;
+  relevance: number;
+}
+
+export interface AgentAction {
+  type: "risk-assessment" | "maintenance-ticket" | "data-retrieval" | "anomaly-scan";
+  status: "pending" | "running" | "completed" | "failed";
+  description: string;
+  result?: string;
+}
+
+export interface ChatSession {
+  id: string;
+  messages: ChatMessage[];
+  createdAt: string;
+  context: {
+    plantId?: string;
+    inverterId?: string;
+  };
+}
+
+/* ── Import ── */
+export interface ImportResult {
+  success: boolean;
+  plantsCreated: number;
+  invertersCreated: number;
+  errors: string[];
+  warnings: string[];
+}
+

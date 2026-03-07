@@ -62,7 +62,7 @@ const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>("User",
 // ── Inverter ─────────────────────────────────────────────
 interface IInverterString { stringId: string; voltage: number; current: number; power: number; status: string; }
 interface IInverter extends Document {
-  inverterId: string; name: string; location: string; status: string;
+  inverterId: string; plantId: string; name: string; location: string; status: string;
   performanceRatio: number; temperature: number; powerOutput: number;
   riskScore: number; lastUpdated: Date; uptime: number; inverterModel: string;
   capacity: number; installDate: Date; firmware: string;
@@ -77,6 +77,7 @@ const InverterStringSchema = new Schema<IInverterString>(
 const InverterSchema = new Schema<IInverter>(
   {
     inverterId:       { type: String, required: true, unique: true },
+    plantId:          { type: String, required: true, index: true },
     name:             { type: String, required: true },
     location:         { type: String, required: true },
     status:           { type: String, enum: ["healthy", "warning", "critical"], default: "healthy" },
@@ -137,12 +138,62 @@ TelemetrySchema.index({ timestamp: 1 }, { expireAfterSeconds: 90 * 24 * 3600 });
 const TelemetryRecord: Model<ITelemetry> =
   mongoose.models.TelemetryRecord || mongoose.model<ITelemetry>("TelemetryRecord", TelemetrySchema);
 
+// ── Plant ────────────────────────────────────────────────
+interface IPlant extends Document {
+  plantId: string; name: string; location: string;
+  latitude: number; longitude: number; capacity: number;
+  area: number; commissionDate: Date; status: string;
+  inverterCount: number; description: string; ownerId: string;
+}
+const PlantSchema = new Schema<IPlant>(
+  {
+    plantId:        { type: String, required: true, unique: true, index: true },
+    name:           { type: String, required: true },
+    location:       { type: String, required: true },
+    latitude:       { type: Number, default: 0 },
+    longitude:      { type: Number, default: 0 },
+    capacity:       { type: Number, required: true },
+    area:           { type: Number, default: 0 },
+    commissionDate: { type: Date, default: Date.now },
+    status:         { type: String, enum: ["active", "maintenance", "offline"], default: "active" },
+    inverterCount:  { type: Number, default: 0 },
+    description:    { type: String, default: "" },
+    ownerId:        { type: String, default: "" },
+  },
+  { timestamps: true }
+);
+const Plant: Model<IPlant> = mongoose.models.Plant || mongoose.model<IPlant>("Plant", PlantSchema);
+
+// ═══════════════════════════════════════════════════════
+// SEED DATA — 3 Plants
+// ═══════════════════════════════════════════════════════
+const PLANTS = [
+  {
+    plantId: "PLANT-001", name: "Rajasthan Solar Park", location: "Rajasthan, Sector 12",
+    latitude: 26.9124, longitude: 70.9001, capacity: 0.5, area: 2.5,
+    commissionDate: "2024-06-01", status: "active",
+    description: "Main utility-scale solar park in Rajasthan with SolarEdge inverters.",
+  },
+  {
+    plantId: "PLANT-002", name: "Gujarat Green Energy Hub", location: "Gujarat, Zone 4",
+    latitude: 23.0225, longitude: 72.5714, capacity: 0.39, area: 1.8,
+    commissionDate: "2024-03-15", status: "active",
+    description: "Mixed fleet installation with Huawei and ABB inverters.",
+  },
+  {
+    plantId: "PLANT-003", name: "Southern Grid Complex", location: "Karnataka, Area 3",
+    latitude: 12.9716, longitude: 77.5946, capacity: 0.625, area: 3.2,
+    commissionDate: "2024-08-01", status: "active",
+    description: "Modern installation with SMA and Growatt inverters plus rooftop arrays.",
+  },
+];
+
 // ═══════════════════════════════════════════════════════
 // SEED DATA — 8 Inverters
 // ═══════════════════════════════════════════════════════
 const INVERTERS = [
   {
-    inverterId: "INV-001", name: "Aurora-7 Block A", location: "Rajasthan, Sector 12",
+    inverterId: "INV-001", plantId: "PLANT-001", name: "Aurora-7 Block A", location: "Rajasthan, Sector 12",
     status: "healthy", performanceRatio: 94.2, temperature: 42, powerOutput: 248.5,
     riskScore: 8, uptime: 99.7, inverterModel: "SolarEdge SE250K", capacity: 250,
     installDate: "2024-06-15", firmware: "v4.12.3", dcVoltage: 620, acVoltage: 233.8,
@@ -154,7 +205,7 @@ const INVERTERS = [
     ],
   },
   {
-    inverterId: "INV-002", name: "Aurora-7 Block B", location: "Rajasthan, Sector 12",
+    inverterId: "INV-002", plantId: "PLANT-001", name: "Aurora-7 Block B", location: "Rajasthan, Sector 12",
     status: "healthy", performanceRatio: 91.8, temperature: 44, powerOutput: 235.1,
     riskScore: 12, uptime: 99.2, inverterModel: "SolarEdge SE250K", capacity: 250,
     installDate: "2024-06-15", firmware: "v4.12.3", dcVoltage: 615, acVoltage: 233.5,
@@ -166,7 +217,7 @@ const INVERTERS = [
     ],
   },
   {
-    inverterId: "INV-003", name: "Solaris-9 East Wing", location: "Gujarat, Zone 4",
+    inverterId: "INV-003", plantId: "PLANT-002", name: "Solaris-9 East Wing", location: "Gujarat, Zone 4",
     status: "warning", performanceRatio: 78.4, temperature: 58, powerOutput: 187.3,
     riskScore: 45, uptime: 96.1, inverterModel: "Huawei SUN2000-215", capacity: 215,
     installDate: "2024-03-22", firmware: "v3.8.1", dcVoltage: 580, acVoltage: 231.2,
@@ -178,7 +229,7 @@ const INVERTERS = [
     ],
   },
   {
-    inverterId: "INV-004", name: "Helios-3 Central", location: "Tamil Nadu, Grid 7",
+    inverterId: "INV-004", plantId: "PLANT-002", name: "Helios-3 Central", location: "Tamil Nadu, Grid 7",
     status: "critical", performanceRatio: 52.1, temperature: 72, powerOutput: 98.6,
     riskScore: 87, uptime: 88.4, inverterModel: "ABB PVS-175", capacity: 175,
     installDate: "2023-11-08", firmware: "v2.9.7", dcVoltage: 480, acVoltage: 228.1,
@@ -190,7 +241,7 @@ const INVERTERS = [
     ],
   },
   {
-    inverterId: "INV-005", name: "Zenith-12 North", location: "Karnataka, Area 3",
+    inverterId: "INV-005", plantId: "PLANT-003", name: "Zenith-12 North", location: "Karnataka, Area 3",
     status: "healthy", performanceRatio: 96.7, temperature: 38, powerOutput: 262.4,
     riskScore: 5, uptime: 99.9, inverterModel: "SMA Sunny Tripower 250", capacity: 250,
     installDate: "2025-01-10", firmware: "v5.1.0", dcVoltage: 640, acVoltage: 234.2,
@@ -202,7 +253,7 @@ const INVERTERS = [
     ],
   },
   {
-    inverterId: "INV-006", name: "Prism-4 Module C", location: "Maharashtra, Sector 8",
+    inverterId: "INV-006", plantId: "PLANT-002", name: "Prism-4 Module C", location: "Maharashtra, Sector 8",
     status: "warning", performanceRatio: 74.2, temperature: 55, powerOutput: 172.8,
     riskScore: 52, uptime: 94.8, inverterModel: "Growatt MAX 200KTL3", capacity: 200,
     installDate: "2024-08-30", firmware: "v3.2.4", dcVoltage: 565, acVoltage: 230.8,
@@ -214,7 +265,7 @@ const INVERTERS = [
     ],
   },
   {
-    inverterId: "INV-007", name: "Nova-6 South Array", location: "Andhra Pradesh, Zone 2",
+    inverterId: "INV-007", plantId: "PLANT-003", name: "Nova-6 South Array", location: "Andhra Pradesh, Zone 2",
     status: "healthy", performanceRatio: 92.5, temperature: 41, powerOutput: 241.9,
     riskScore: 10, uptime: 99.5, inverterModel: "SolarEdge SE250K", capacity: 250,
     installDate: "2024-09-12", firmware: "v4.12.3", dcVoltage: 625, acVoltage: 234.0,
@@ -226,7 +277,7 @@ const INVERTERS = [
     ],
   },
   {
-    inverterId: "INV-008", name: "Eclipse-2 West", location: "Madhya Pradesh, Grid 5",
+    inverterId: "INV-008", plantId: "PLANT-003", name: "Eclipse-2 West", location: "Madhya Pradesh, Grid 5",
     status: "critical", performanceRatio: 38.9, temperature: 78, powerOutput: 67.2,
     riskScore: 93, uptime: 82.1, inverterModel: "ABB PVS-175", capacity: 175,
     installDate: "2023-09-20", firmware: "v2.9.5", dcVoltage: 420, acVoltage: 226.4,
@@ -291,21 +342,38 @@ async function main() {
 
   // ── Collections are created automatically on first insert ──
 
-  // Ensure indexes exist on all 3 collections
+  // Ensure indexes exist on all collections
   console.log("\n📐  Syncing indexes...");
   await User.createIndexes();
+  await Plant.createIndexes();
   await Inverter.createIndexes();
   await TelemetryRecord.createIndexes();
   console.log("✅  Indexes ready");
 
   // Check existing data
+  const existingPlants = await Plant.countDocuments();
   const existingInverters = await Inverter.countDocuments();
-  if (existingInverters > 0) {
-    console.log(`\n⚠️   Already seeded (${existingInverters} inverters found). Nothing to do.`);
-    console.log("    To reseed: delete the 'inverters' and 'telemetryrecords' collections in Atlas UI first.\n");
+  if (existingPlants > 0 && existingInverters > 0) {
+    console.log(`\n⚠️   Already seeded (${existingPlants} plants, ${existingInverters} inverters found). Nothing to do.`);
+    console.log("    To reseed: delete the 'plants', 'inverters' and 'telemetryrecords' collections first.\n");
     await mongoose.disconnect();
     return;
   }
+
+  // ── Clean slate ────────────────────────────────────
+  await Plant.deleteMany({});
+  await Inverter.deleteMany({});
+  await TelemetryRecord.deleteMany({});
+
+  // ── Seed Plants ────────────────────────────────────
+  console.log("\n🏭  Seeding 3 plants...");
+  const plantDocs = PLANTS.map((p) => ({
+    ...p,
+    commissionDate: new Date(p.commissionDate),
+    inverterCount: INVERTERS.filter((inv) => inv.plantId === p.plantId).length,
+  }));
+  await Plant.insertMany(plantDocs);
+  console.log(`✅  ${plantDocs.length} plants inserted`);
 
   // ── Seed Inverters ─────────────────────────────────
   console.log("\n🔌  Seeding 8 inverters...");
@@ -345,6 +413,7 @@ async function main() {
   console.log("\n──────────────────────────────────────");
   console.log("🎉  Seed complete! Collections created:");
   console.log(`    📁 users           — 0 docs (populated on first sign-in)`);
+  console.log(`    📁 plants          — ${plantDocs.length} docs`);
   console.log(`    📁 inverters       — ${inverterDocs.length} docs`);
   console.log(`    📁 telemetryrecords — ${inserted} docs`);
   console.log("\n    View your data at: https://cloud.mongodb.com\n");

@@ -103,6 +103,25 @@
   background: hsl(240 4% 30%);
 }
 
+/* ── Thin scrollbar for inner panels ── */
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(240 4% 18%) transparent;
+}
+.scroll-thin::-webkit-scrollbar {
+  width: 4px;
+}
+.scroll-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: hsl(240 4% 18%);
+  border-radius: 2px;
+}
+.scroll-thin::-webkit-scrollbar-thumb:hover {
+  background: hsl(240 4% 28%);
+}
+
 /* ── Glassmorphism Utility ── */
 .glass {
   background: rgba(15, 15, 18, 0.6);
@@ -221,65 +240,106 @@
 }
 
 /* ─────────────────────────────────────────────────────────
- * Tremor BarChart — force bar fill colors in dark mode
- * Tremor maps color names to Tailwind CSS vars which are
- * near-transparent on dark backgrounds. Override explicitly.
+ * Tremor Charts — Dark Mode Color Overrides
+ * Tremor v3 maps color names to Tailwind CSS custom
+ * properties. In dark mode these resolve to low-contrast
+ * shades. We override the Tremor color variables directly
+ * to vivid, high-contrast values on dark backgrounds.
  * ───────────────────────────────────────────────────────── */
 
-/* emerald bars */
-.dark .recharts-bar-rectangle path[fill*="emerald"],
-.dark .recharts-rectangle[fill*="emerald"] {
-  fill: #10b981 !important;
-}
-/* violet / purple bars */
-.dark .recharts-bar-rectangle path[fill*="violet"],
-.dark .recharts-rectangle[fill*="violet"] {
-  fill: #8b5cf6 !important;
-}
-/* slate bars */
-.dark .recharts-bar-rectangle path[fill*="slate"],
-.dark .recharts-rectangle[fill*="slate"] {
-  fill: #64748b !important;
-}
-/* zinc bars */
-.dark .recharts-bar-rectangle path[fill*="zinc"],
-.dark .recharts-rectangle[fill*="zinc"] {
-  fill: #71717a !important;
-}
-/* rose bars */
-.dark .recharts-bar-rectangle path[fill*="rose"],
-.dark .recharts-rectangle[fill*="rose"] {
-  fill: #f43f5e !important;
-}
-/* amber / yellow bars */
-.dark .recharts-bar-rectangle path[fill*="amber"],
-.dark .recharts-rectangle[fill*="amber"] {
-  fill: #f59e0b !important;
-}
-/* blue bars */
-.dark .recharts-bar-rectangle path[fill*="blue"],
-.dark .recharts-rectangle[fill*="blue"] {
-  fill: #3b82f6 !important;
-}
-/* cyan bars */
-.dark .recharts-bar-rectangle path[fill*="cyan"],
-.dark .recharts-rectangle[fill*="cyan"] {
-  fill: #06b6d4 !important;
+/* ── Tremor color CSS custom property overrides ── */
+.dark {
+  --tremor-content-subtle:       hsl(240 4% 55%);
+  --tremor-content-default:      hsl(0 0% 85%);
+  --tremor-content-emphasis:     hsl(0 0% 95%);
+  --tremor-content-strong:       hsl(0 0% 100%);
+  --tremor-content-inverted:     hsl(0 0% 0%);
+  --tremor-border-default:       hsl(240 4% 18%);
+  --tremor-ring:                 hsl(240 4% 25%);
+  --tremor-background-muted:     hsl(240 5% 8%);
+  --tremor-background-subtle:    hsl(240 5% 10%);
+  --tremor-background-default:   hsl(240 5% 6%);
+  --tremor-background-emphasis:  hsl(240 4% 18%);
+  --tremor-brand-subtle:         hsl(270 50% 30%);
+  --tremor-brand-default:        hsl(270 50% 55%);
+  --tremor-brand-emphasis:       hsl(270 50% 65%);
+  --tremor-brand-inverted:       hsl(0 0% 100%);
 }
 
-/* Tremor uses CSS custom properties for bar colors — override those too */
-.dark [class*="tremor"] .recharts-bar-rectangle path {
+/* ── Force all bar/area/line fill opacity to 1 ── */
+.dark [class*="tremor"] .recharts-bar-rectangle path,
+.dark [class*="tremor"] .recharts-active-bar path {
+  opacity: 1 !important;
+}
+.dark [class*="tremor"] .recharts-area-area {
+  opacity: 0.25 !important;
+}
+.dark [class*="tremor"] .recharts-area-curve {
+  opacity: 1 !important;
+  stroke-width: 2px;
+}
+.dark .recharts-pie-sector path,
+.dark .recharts-sector {
   opacity: 1 !important;
 }
 
-/* Force Tremor color fill via fill attribute patterns */
-.dark .recharts-bar-rectangle path[fill="var(--tremor-brand)"] { fill: #3b82f6 !important; }
-.dark .recharts-bar-rectangle path[name="This Year"] { fill: #10b981 !important; }
-.dark .recharts-bar-rectangle path[name="Last Year"] { fill: #64748b !important; }
-.dark .recharts-bar-rectangle path[name="Target"]    { fill: #8b5cf6 !important; }
-.dark .recharts-bar-rectangle path[name="CO₂ Avoided (kg)"] { fill: #10b981 !important; }
-.dark .recharts-bar-rectangle path[name="Last Year (kg)"]   { fill: #71717a !important; }
-.dark .recharts-bar-rectangle path[name="Confidence"]       { fill: #8b5cf6 !important; }
-.dark .recharts-bar-rectangle path[name="Imported"]         { fill: #f43f5e !important; }
-.dark .recharts-bar-rectangle path[name="Exported"]         { fill: #10b981 !important; }
+/* ── Tremor color-class → vivid fill mapping ──
+ * Tremor generates classes like fill-emerald-500, stroke-emerald-500
+ * Override via specificity on dark mode. */
+
+/* emerald (#10b981) */
+.dark .fill-emerald-500, .dark [class*="fill-emerald"] { fill: #10b981 !important; }
+.dark .stroke-emerald-500, .dark [class*="stroke-emerald"] { stroke: #10b981 !important; }
+
+/* blue (#3b82f6) */
+.dark .fill-blue-500, .dark [class*="fill-blue"] { fill: #3b82f6 !important; }
+.dark .stroke-blue-500, .dark [class*="stroke-blue"] { stroke: #3b82f6 !important; }
+
+/* violet (#8b5cf6) */
+.dark .fill-violet-500, .dark [class*="fill-violet"] { fill: #8b5cf6 !important; }
+.dark .stroke-violet-500, .dark [class*="stroke-violet"] { stroke: #8b5cf6 !important; }
+
+/* cyan (#06b6d4) */
+.dark .fill-cyan-500, .dark [class*="fill-cyan"] { fill: #06b6d4 !important; }
+.dark .stroke-cyan-500, .dark [class*="stroke-cyan"] { stroke: #06b6d4 !important; }
+
+/* rose (#f43f5e) */
+.dark .fill-rose-500, .dark [class*="fill-rose"] { fill: #f43f5e !important; }
+.dark .stroke-rose-500, .dark [class*="stroke-rose"] { stroke: #f43f5e !important; }
+
+/* amber (#f59e0b) */
+.dark .fill-amber-500, .dark [class*="fill-amber"] { fill: #f59e0b !important; }
+.dark .stroke-amber-500, .dark [class*="stroke-amber"] { stroke: #f59e0b !important; }
+
+/* fuchsia (#d946ef) */
+.dark .fill-fuchsia-500, .dark [class*="fill-fuchsia"] { fill: #d946ef !important; }
+.dark .stroke-fuchsia-500, .dark [class*="stroke-fuchsia"] { stroke: #d946ef !important; }
+
+/* slate (#94a3b8) — brighter in dark mode */
+.dark .fill-slate-500, .dark [class*="fill-slate"] { fill: #94a3b8 !important; }
+.dark .stroke-slate-500, .dark [class*="stroke-slate"] { stroke: #94a3b8 !important; }
+
+/* zinc (#a1a1aa) */
+.dark .fill-zinc-500, .dark [class*="fill-zinc"] { fill: #a1a1aa !important; }
+.dark .stroke-zinc-500, .dark [class*="stroke-zinc"] { stroke: #a1a1aa !important; }
+
+/* purple (#a855f7) */
+.dark .fill-purple-500, .dark [class*="fill-purple"] { fill: #a855f7 !important; }
+.dark .stroke-purple-500, .dark [class*="stroke-purple"] { stroke: #a855f7 !important; }
+
+/* green (#22c55e) */
+.dark .fill-green-500, .dark [class*="fill-green"] { fill: #22c55e !important; }
+.dark .stroke-green-500, .dark [class*="stroke-green"] { stroke: #22c55e !important; }
+
+/* yellow (#eab308) */
+.dark .fill-yellow-500, .dark [class*="fill-yellow"] { fill: #eab308 !important; }
+.dark .stroke-yellow-500, .dark [class*="stroke-yellow"] { stroke: #eab308 !important; }
+
+/* ── Recharts SVG direct color overrides ──
+ * Some recharts elements use inline fill/stroke attrs. */
+.dark .recharts-rectangle { opacity: 1 !important; }
+.dark .recharts-bar-rectangle rect { opacity: 1 !important; }
+
+/* ── Donut / Pie label text ── */
+.dark .recharts-pie-label-text { fill: hsl(0 0% 85%) !important; }
 

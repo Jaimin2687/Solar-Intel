@@ -11,8 +11,8 @@
 export { connectDB, env } from "./config";
 
 // Models
-export { User, Inverter, TelemetryRecord } from "./models";
-export type { IUser, IInverter, IInverterString, ITelemetryRecord } from "./models";
+export { User, Inverter, TelemetryRecord, MaintenanceTask } from "./models";
+export type { IUser, IInverter, IInverterString, ITelemetryRecord, IMaintenanceTask } from "./models";
 
 // Services
 export {
@@ -39,6 +39,14 @@ export {
   sendMaintenanceReminder,
 } from "./services";
 export type { EmailOptions, AlertEmailData, WeeklyReportData, MaintenanceReminderData } from "./services";
+
+// Maintenance
+export {
+  getAllMaintenanceTasks, getMaintenanceTaskById, createMaintenanceTask,
+  updateMaintenanceTask, deleteMaintenanceTask, syncAIMaintenanceTasks,
+  getMaintenanceStats,
+} from "./services";
+export type { CreateMaintenanceInput, UpdateMaintenanceInput } from "./services";
 
 // Middleware
 export { getAuthenticatedUser, checkRateLimit } from "./middleware";

@@ -17,6 +17,16 @@ const config: Config = {
     // Tremor module
     "./node_modules/@tremor/**/*.{js,ts,jsx,tsx}",
   ],
+  /* ── Safelist Tremor chart fill/stroke colors ──
+   * Tremor constructs fill/stroke classes dynamically via template
+   * literals. Tailwind's JIT can't always detect them so we safelist. */
+  safelist: [
+    {
+      pattern:
+        /^(fill|stroke)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(50|100|200|300|400|500|600|700|800|900|950)$/,
+      variants: ["dark"],
+    },
+  ],
   theme: {
     extend: {
       /* ── Aubergine Monochrome Palette ── */

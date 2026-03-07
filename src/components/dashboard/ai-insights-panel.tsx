@@ -84,12 +84,13 @@ export function AIInsightsPanel({ insights }: AIInsightsPanelProps) {
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-3 pb-5">
+        <CardContent className="pb-4 pt-0">
+          <div className="scroll-thin max-h-[400px] overflow-y-auto overscroll-contain rounded-lg border border-border/30 bg-background/30 p-2">
           <motion.div
             variants={staggerContainer}
             initial="hidden"
             animate="visible"
-            className="space-y-3"
+            className="space-y-2"
           >
             {insights.map((insight) => {
               const isExpanded = expandedId === insight.id;
@@ -202,6 +203,7 @@ export function AIInsightsPanel({ insights }: AIInsightsPanelProps) {
               );
             })}
           </motion.div>
+          </div>
         </CardContent>
       </Card>
     </motion.div>

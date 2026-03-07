@@ -14,7 +14,7 @@
 
 import { connectDB } from "@/backend/config";
 import { env } from "@/backend/config/env";
-import { Inverter as InverterModel } from "@/backend/models";
+import { Inverter as InverterModel, TelemetryRecord } from "@/backend/models";
 import { getMLPredictions, type MLPrediction } from "@/backend/services/ml-prediction.service";
 import logger from "@/backend/utils/logger";
 import type {
@@ -166,9 +166,9 @@ function ruleBasedInsights(dbInverters: any[]): { insights: AIInsight[]; mainten
         summary: inv.status === "critical"
           ? `Critical degradation — ${inv.performanceRatio}% PR, risk score ${inv.riskScore}/100.`
           : `Performance declining — ${inv.performanceRatio}% PR, monitoring required.`,
-        reasoning: `Temperature: ${inv.temperature}°C, Efficiency: ${inv.efficiency}%, Power: ${inv.powerOutput}kW / ${inv.capacity}kW capacity.`,
+        reasoning: `Temperature: ${inv.inverterTemp}°C, Efficiency: ${inv.efficiency}%, Power: ${((inv.inverterPower || 0) / 1000).toFixed(1)}kW / ${inv.capacity}kW capacity.`,
         recommendations: [
-          inv.temperature > 65 ? "Reduce load and inspect cooling system immediately." : "Continue temperature monitoring.",
+          inv.inverterTemp > 65 ? "Reduce load and inspect cooling system immediately." : "Continue temperature monitoring.",
           inv.efficiency < 85 ? "Schedule MPPT recalibration and efficiency diagnostic." : "Efficiency within tolerance.",
           `Risk score: ${inv.riskScore}/100 — ${inv.riskScore > 70 ? "emergency action required" : "schedule preventive check"}.`,
         ],
@@ -204,11 +204,6 @@ export async function getAIAdvisorData(): Promise<AIAdvisorData> {
   await connectDB();
 
   const dbInverters = await InverterModel.find({}).lean();
-
-  if (dbInverters.length === 0) {
-    const { fetchAIAdvisor } = await import("@/lib/mock-data");
-    return fetchAIAdvisor();
-  }
 
   // ═══════════════════════════════════════════════════════
   // STEP 1: Call ML Model (PRIMARY risk source)
@@ -249,18 +244,18 @@ export async function getAIAdvisorData(): Promise<AIAdvisorData> {
     }
 
     // Keep deterministic checks for specific parameters
-    if (inv.temperature > 60) {
+    if (inv.inverterTemp > 60) {
       anomalies.push({
         id: `AN-${inv.inverterId}-temp`,
         inverterId: inv.inverterId,
         inverterName: inv.name,
         timestamp: new Date().toISOString(),
-        severity: inv.temperature > 70 ? "critical" : "warning",
+        severity: inv.inverterTemp > 70 ? "critical" : "warning",
         parameter: "Junction Temperature",
         expectedValue: 55,
-        actualValue: inv.temperature,
+        actualValue: inv.inverterTemp,
         unit: "°C",
-        description: `Temperature ${Math.round(((inv.temperature - 55) / 55) * 100)}% above safe operating limit`,
+        description: `Temperature ${Math.round(((inv.inverterTemp - 55) / 55) * 100)}% above safe operating limit`,
         isResolved: false,
       });
     }
@@ -297,18 +292,18 @@ export async function getAIAdvisorData(): Promise<AIAdvisorData> {
       });
     }
 
-    if (inv.frequency < 49.85 || inv.frequency > 50.15) {
+    if (inv.inverterAlarmCode > 0) {
       anomalies.push({
-        id: `AN-${inv.inverterId}-freq`,
+        id: `AN-${inv.inverterId}-alarm`,
         inverterId: inv.inverterId,
         inverterName: inv.name,
         timestamp: new Date().toISOString(),
         severity: "warning",
-        parameter: "Grid Frequency",
-        expectedValue: 50.0,
-        actualValue: inv.frequency,
-        unit: "Hz",
-        description: `Grid frequency deviation: ${inv.frequency}Hz (±0.15Hz tolerance)`,
+        parameter: "Alarm Code",
+        expectedValue: 0,
+        actualValue: inv.inverterAlarmCode,
+        unit: "",
+        description: `Active alarm code ${inv.inverterAlarmCode} detected`,
         isResolved: false,
       });
     }
@@ -322,7 +317,7 @@ export async function getAIAdvisorData(): Promise<AIAdvisorData> {
 
   // Build compact inverter telemetry string for Groq
   const inverterSummary = dbInverters.map((inv) =>
-    `${inv.inverterId} "${inv.name}" | Status: ${inv.status} | PR: ${inv.performanceRatio}% | Temp: ${inv.temperature}°C | Power: ${inv.powerOutput}/${inv.capacity}kW | Efficiency: ${inv.efficiency}% | Risk: ${inv.riskScore}/100 | DC: ${inv.dcVoltage}V | AC: ${inv.acVoltage}V | Freq: ${inv.frequency}Hz | Uptime: ${inv.uptime}%`
+    `${inv.inverterId} "${inv.name}" | Status: ${inv.status} | PR: ${inv.performanceRatio}% | Temp: ${inv.inverterTemp}°C | Power: ${((inv.inverterPower || 0) / 1000).toFixed(1)}/${inv.capacity}kW | Efficiency: ${inv.efficiency}% | Risk: ${inv.riskScore}/100 | PV1: ${inv.inverterPv1Voltage}V/${inv.inverterPv1Current}A | PV2: ${inv.inverterPv2Voltage}V | Alarm: ${inv.inverterAlarmCode} | Uptime: ${inv.uptime}%`
   ).join("\n");
 
   // Build ML context string for Groq to explain
@@ -416,42 +411,134 @@ export async function getAIAdvisorData(): Promise<AIAdvisorData> {
   }
 
   // ═══════════════════════════════════════════════════════
-  // STEP 4: 48hr Solar Forecast (deterministic)
+  // STEP 4: 48hr Solar Forecast (from real telemetry patterns)
   // ═══════════════════════════════════════════════════════
+  // Build hourly profile from the last 7 days of real telemetry
+  const forecastLookback = new Date();
+  forecastLookback.setDate(forecastLookback.getDate() - 7);
+
+  const hourlyProfile = await TelemetryRecord.aggregate([
+    { $match: { timestamp: { $gte: forecastLookback } } },
+    {
+      $group: {
+        _id: { hour: { $hour: "$timestamp" } },
+        avgPower: { $avg: "$inverterPower" },
+        avgTemp: { $avg: "$inverterTemp" },
+        count: { $sum: 1 },
+      },
+    },
+    { $sort: { "_id.hour": 1 } },
+  ]);
+
+  // Index by hour for quick lookup
+  const profileByHour: Record<number, { power: number; temp: number }> = {};
+  for (const h of hourlyProfile) {
+    profileByHour[h._id.hour] = {
+      power: Math.round(h.avgPower * 100) / 100,
+      temp: Math.round(h.avgTemp * 10) / 10,
+    };
+  }
+
   const forecast: SolarForecast[] = Array.from({ length: 48 }, (_, i) => {
     const d = new Date();
     d.setHours(d.getHours() + i);
     const hour = d.getHours();
     const dayOffset = Math.floor(i / 24);
+    const profile = profileByHour[hour];
     const isSunny = hour >= 6 && hour <= 18;
-    const weatherOptions: ("sunny" | "partly-cloudy" | "cloudy" | "rainy")[] = ["sunny", "partly-cloudy", "cloudy", "rainy"];
-    const weatherIdx = dayOffset === 0 ? (hour < 14 ? 0 : 1) : (hour < 10 ? 0 : hour < 15 ? 1 : 2);
+
+    // Real data-based prediction with day-ahead decay factor
+    const basePower = profile?.power ?? 0;
+    const baseTemp = profile?.temp ?? 25;
+    // Estimate irradiance from power output (no irradiance sensor in new dataset)
+    const baseIrradiance = basePower > 0 ? Math.min(1000, basePower / 0.8) : (isSunny ? 200 : 0);
+
+    // Day 2 predictions degrade slightly (less confidence)
+    const decayFactor = 1 - dayOffset * 0.12;
+
+    // Weather estimation from irradiance levels
+    const weatherOptions: ("sunny" | "partly-cloudy" | "cloudy" | "rainy")[] =
+      ["sunny", "partly-cloudy", "cloudy", "rainy"];
+    let weatherIdx = 0;
+    if (baseIrradiance > 600) weatherIdx = 0;
+    else if (baseIrradiance > 350) weatherIdx = 1;
+    else if (baseIrradiance > 100) weatherIdx = 2;
+    else weatherIdx = isSunny ? 2 : 0; // cloudy during day, clear at night
+
     return {
       date: d.toISOString().split("T")[0],
       hour,
-      predicted: isSunny ? Math.round(Math.sin(((hour - 6) / 12) * Math.PI) * 14 * (1 - dayOffset * 0.15) * 100) / 100 : 0,
-      confidence: isSunny ? Math.round((0.92 - dayOffset * 0.08 - Math.abs(hour - 12) * 0.01) * 100) / 100 : 0.99,
-      weather: weatherOptions[Math.min(weatherIdx, 3)],
-      irradiance: isSunny ? Math.round(Math.sin(((hour - 6) / 12) * Math.PI) * 950 * (1 - dayOffset * 0.1)) : 0,
-      temperature: Math.round((28 + Math.sin(((hour - 6) / 24) * Math.PI * 2) * 8) * 10) / 10,
+      predicted: Math.round(basePower * decayFactor * 100) / 100,
+      confidence: isSunny && basePower > 0
+        ? Math.round((0.92 - dayOffset * 0.1) * 100) / 100
+        : 0.99,
+      weather: weatherOptions[weatherIdx],
+      irradiance: Math.round(baseIrradiance * decayFactor),
+      temperature: baseTemp,
     };
   });
 
-  // ── Risk Timeline (ML-grounded when available) ──
+  // ── Risk Timeline (from real daily telemetry aggregates) ──
   const avgMLRisk = mlPredictions && mlPredictions.length > 0
     ? mlPredictions.reduce((s, p) => s + p.risk_score, 0) / mlPredictions.length
     : null;
 
+  // Aggregate daily performance over last 14 days to build risk trajectory
+  const riskLookback = new Date();
+  riskLookback.setDate(riskLookback.getDate() - 13);
+  riskLookback.setHours(0, 0, 0, 0);
+
+  const dailyPerfAgg = await TelemetryRecord.aggregate([
+    { $match: { timestamp: { $gte: riskLookback } } },
+    {
+      $group: {
+        _id: {
+          year: { $year: "$timestamp" },
+          month: { $month: "$timestamp" },
+          day: { $dayOfMonth: "$timestamp" },
+        },
+        avgPower: { $avg: "$inverterPower" },
+        avgTemp: { $avg: "$inverterTemp" },
+        minVoltage: { $min: "$inverterPv1Voltage" },
+        maxVoltage: { $max: "$inverterPv1Voltage" },
+        count: { $sum: 1 },
+      },
+    },
+    { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 } },
+  ]);
+
+  // Build a map of date → risk score from telemetry
+  const dailyRiskMap: Record<string, number> = {};
+  for (const day of dailyPerfAgg) {
+    const dateStr = `${day._id.year}-${String(day._id.month).padStart(2, "0")}-${String(day._id.day).padStart(2, "0")}`;
+    // Risk = inverse of power level + temperature stress + voltage instability
+    const powerRisk = day.avgPower > 0 ? Math.max(0, 30 - (day.avgPower / 100)) : 30; // low power = higher risk
+    const tempRisk = day.avgTemp > 50 ? 20 : day.avgTemp > 40 ? 10 : 0; // overheating risk
+    const voltageRange = (day.maxVoltage || 230) - (day.minVoltage || 230);
+    const voltageRisk = voltageRange > 20 ? 15 : voltageRange > 10 ? 8 : 0;
+    dailyRiskMap[dateStr] = Math.min(100, powerRisk + tempRisk + voltageRisk);
+  }
+
   const riskTimeline: RiskTimelinePoint[] = Array.from({ length: 14 }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() - 13 + i);
-    // Use ML average risk as the "today" anchor, decay backwards with noise
-    const baseRisk = avgMLRisk != null
-      ? avgMLRisk * 100 * (0.6 + 0.4 * (i / 13)) + Math.sin(i * 0.7) * 5
-      : 25 + i * 3.5 + Math.sin(i * 0.5) * 8;
+    const dateStr = d.toISOString().split("T")[0];
+
+    // Use real telemetry-derived risk, fallback to ML avg for today if available
+    let riskScore: number;
+    if (dailyRiskMap[dateStr] !== undefined) {
+      riskScore = dailyRiskMap[dateStr];
+    } else if (i === 13 && avgMLRisk != null) {
+      // Today: use ML prediction if available
+      riskScore = avgMLRisk * 100;
+    } else {
+      // No data for this day — interpolate from neighbors
+      riskScore = avgMLRisk != null ? avgMLRisk * 100 * 0.8 : 20;
+    }
+
     return {
-      date: d.toISOString().split("T")[0],
-      riskScore: Math.round(Math.max(0, Math.min(100, baseRisk)) * 10) / 10,
+      date: dateStr,
+      riskScore: Math.round(Math.max(0, Math.min(100, riskScore)) * 10) / 10,
       events: i === 13 && mlPredictions
         ? mlPredictions.filter((p) => p.failure_predicted).map((p) => `ML alert: ${p.inverter_id}`)
         : [],
