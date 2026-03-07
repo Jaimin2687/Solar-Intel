@@ -44,7 +44,7 @@ export async function getMLPredictions(dbInverters: any[]): Promise<MLPrediction
   const mlUrl = env.ML_SERVICE_URL.replace("/predict", "");
 
   try {
-    const inverterIds = dbInverters.map((inv: any) => inv.inverterId).filter(Boolean);
+    const inverterIds = dbInverters.map((inv) => inv.inverterId).filter(Boolean);
 
     if (inverterIds.length === 0) {
       logger.warn("No inverter IDs to send to ML service");

@@ -41,7 +41,6 @@ import {
   Leaf,
   MessageSquare,
   Settings,
-  Zap,
   X,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";

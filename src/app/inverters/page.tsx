@@ -401,7 +401,7 @@ export default function InvertersPage() {
 
   // ── Mutations
   const createMutation = useMutation({
-    mutationFn: (data: Partial<Inverter>) => apiCreateInverter({ ...data, inverterId: data.id } as any),
+    mutationFn: (data: Partial<Inverter>) => apiCreateInverter({ ...data, inverterId: data.id } as Partial<Inverter> & { inverterId?: string }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["inverters"] }); qc.invalidateQueries({ queryKey: ["plants"] }); setAddOpen(false); setFormError(null); },
     onError:   (err: Error) => setFormError(err.message),
   });

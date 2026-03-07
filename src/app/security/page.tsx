@@ -44,14 +44,13 @@ import {
   Filter,
   TrendingUp,
   TrendingDown,
-  XCircle,
   BarChart3,
   FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { TranslatedText } from "@/components/ui/translated-text";
-import type { GridEvent, AnomalySeverity } from "@/types";
+import type { AnomalySeverity } from "@/types";
 
 /* ── Constants ── */
 const REFRESH_INTERVAL = 60_000;

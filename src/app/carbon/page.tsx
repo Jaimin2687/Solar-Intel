@@ -46,7 +46,7 @@ import {
   Award,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { TranslatedText } from "@/components/ui/translated-text";
 
 /* ── Constants for carbon calculations ── */
@@ -142,7 +142,6 @@ export default function CarbonImpactPage() {
   /* ── Goal tracking ── */
   const annualizedCO2Tons = (totalCO2Avoided / 1000) * (365 / rangeDays);
   const goalProgress = Math.min(100, Math.round((annualizedCO2Tons / ANNUAL_CARBON_GOAL_TONS) * 100));
-  const daysRemaining = Math.round((1 - annualizedCO2Tons / ANNUAL_CARBON_GOAL_TONS) * 365);
 
   /* ── Carbon over time chart ── */
   const carbonTimeline = dailyData.map((d) => ({

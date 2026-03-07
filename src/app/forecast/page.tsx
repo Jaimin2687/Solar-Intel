@@ -43,7 +43,7 @@ import {
   BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { TranslatedText } from "@/components/ui/translated-text";
 
 /* ── Weather icon mapping ── */
