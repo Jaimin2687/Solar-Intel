@@ -29,23 +29,23 @@ const CSV_PATH = path.resolve(__dirname, "../../Solar_Plant_Dataset/master_refin
 // How many records per inverter to seed as telemetry
 const RECORDS_PER_INVERTER = 96;
 
-// Plant metadata (capacity in MW based on actual CSV inverter power ranges)
-// Plant 1: 23 inverters × ~350W peak = ~8.05 kW = 0.008 MW total
-// Plant 2: 5 inverters × ~110W peak = ~0.55 kW = 0.00055 MW total
-// Plant 3: 1 inverter × ~65W peak = ~0.065 kW
-// For display we show realistic MW-scale values since this represents a solar park
+// Plant metadata (realistic utility-scale capacity in MW)
 const PLANT_META = {
-  "Plant 1": { name: "Rajasthan Solar Park", location: "Rajasthan, India", lat: 26.9124, lng: 70.9012, capacity: 5.75, area: 42 },
-  "Plant 2": { name: "Gujarat Solar Farm",   location: "Gujarat, India",   lat: 23.0225, lng: 72.5714, capacity: 1.25, area: 9 },
-  "Plant 3": { name: "Karnataka PV Station", location: "Karnataka, India", lat: 15.3173, lng: 75.7139, capacity: 0.25, area: 2 },
+  "Plant 1": { name: "Rajasthan Solar Park", location: "Rajasthan, India", lat: 26.9124, lng: 70.9012, capacity: 50, area: 200 },
+  "Plant 2": { name: "Gujarat Solar Farm",   location: "Gujarat, India",   lat: 23.0225, lng: 72.5714, capacity: 25, area: 100 },
+  "Plant 3": { name: "Karnataka PV Station", location: "Karnataka, India", lat: 15.3173, lng: 75.7139, capacity: 10, area: 40 },
 };
 
-// Per-inverter rated capacity in WATTS (based on max observed power in CSV)
-const INVERTER_CAPACITY_W = {
-  "Plant 1": 350,   // max ~325-352W seen across Plant 1 inverters
-  "Plant 2": 110,   // max ~85-108W seen across Plant 2 inverters (excl. outliers)
-  "Plant 3": 70,    // max ~64W seen for Plant 3 inverter
+// Per-inverter rated capacity in kW (utility-scale inverters: 250-500kW each)
+const INVERTER_CAPACITY_KW = {
+  "Plant 1": 250,   // 23 inverters × 250kW = 5.75 MW nameplate (50MW plant has headroom)
+  "Plant 2": 200,   // 5 inverters × 200kW = 1 MW 
+  "Plant 3": 150,   // 1 inverter × 150kW = 0.15 MW
 };
+
+// Scaling factor: CSV has ~350W max, we want ~250kW = scale by ~714x
+// We'll use a more conservative 500x to get ~175kW typical power
+const POWER_SCALE = 500;
 
 async function main() {
   console.log("═══════════════════════════════════════════════════════");
@@ -131,19 +131,30 @@ async function main() {
     }
 
     const inverterId = `INV-${plantId.replace("Plant ", "P")}-${invId}`;
-    const ratedCapacityW = INVERTER_CAPACITY_W[plantId] || 350;
+    const ratedCapacityKw = INVERTER_CAPACITY_KW[plantId] || 250;
 
-    // Compute efficiency and performance ratio from actual telemetry data
-    // avgPower / ratedCapacity gives the utilization factor
-    const avgPower = telemetryRows.reduce((s, r) => s + (r.inverter_power || 0), 0) / telemetryRows.length;
-    const maxPower = Math.max(...telemetryRows.map(r => r.inverter_power || 0));
+    // Scale power values to realistic utility-scale (CSV has ~350W, we want ~175kW)
+    const scaledRows = telemetryRows.map(r => ({
+      ...r,
+      inverter_power: (r.inverter_power || 0) * POWER_SCALE,
+      inverter_pv1_power: (r.inverter_pv1_power || 0) * POWER_SCALE,
+      inverter_pv2_power: (r.inverter_pv2_power || 0) * POWER_SCALE,
+      inverter_kwh_today: (r.inverter_kwh_today || 0) * POWER_SCALE,
+      inverter_kwh_total: (r.inverter_kwh_total || 0) * POWER_SCALE,
+      meter_active_power: (r.meter_active_power || 0) * POWER_SCALE,
+    }));
+    const lastScaled = scaledRows[scaledRows.length - 1];
+
+    // Compute efficiency and performance ratio from scaled telemetry
+    const avgPowerW = scaledRows.reduce((s, r) => s + r.inverter_power, 0) / scaledRows.length;
+    const maxPowerW = Math.max(...scaledRows.map(r => r.inverter_power));
+    const ratedCapacityW = ratedCapacityKw * 1000;
     
     // Performance ratio: actual avg output / rated capacity (as percentage)
-    // Healthy inverters: 30-45% (includes night time), degraded: 15-25%, failing: <15%
-    const rawPR = (avgPower / ratedCapacityW) * 100;
+    const rawPR = (avgPowerW / ratedCapacityW) * 100;
     
-    // Efficiency: peak output / rated capacity (best-case)
-    const rawEff = (maxPower / ratedCapacityW) * 100;
+    // Efficiency: peak output / rated capacity
+    const rawEff = (maxPowerW / ratedCapacityW) * 100;
     
     // Adjust PR based on inverter health — healthy units get bonus from daytime-only average
     let performanceRatio, efficiency;
@@ -169,26 +180,26 @@ async function main() {
       location: PLANT_META[plantId]?.location || "India",
       status,
       riskScore,
-      capacity: Math.round(ratedCapacityW / 1000 * 100) / 100, // in kW
+      capacity: ratedCapacityKw, // in kW (utility-scale: 150-250kW)
       efficiency: Math.max(efficiency, 15),
       performanceRatio: Math.max(Math.round(performanceRatio * 10) / 10, 15),
       uptime: status === "critical" ? 70 + Math.random() * 10 : status === "warning" ? 85 + Math.random() * 10 : 95 + Math.random() * 5,
-      // Latest telemetry snapshot
-      inverterPower: lastRow.inverter_power || 0,
-      inverterPv1Power: lastRow.inverter_pv1_power || 0,
-      inverterPv1Voltage: lastRow.inverter_pv1_voltage || 0,
-      inverterPv1Current: lastRow.inverter_pv1_current || 0,
-      inverterPv2Power: lastRow.inverter_pv2_power || 0,
-      inverterPv2Voltage: lastRow.inverter_pv2_voltage || 0,
-      inverterPv2Current: lastRow.inverter_pv2_current || 0,
-      inverterKwhToday: lastRow.inverter_kwh_today || 0,
-      inverterKwhTotal: lastRow.inverter_kwh_total || 0,
-      inverterTemp: lastRow.inverter_temp || 0,
-      inverterOpState: lastRow.inverter_op_state || 0,
+      // Latest telemetry snapshot (SCALED to realistic values)
+      inverterPower: Math.round(lastScaled.inverter_power),
+      inverterPv1Power: Math.round(lastScaled.inverter_pv1_power),
+      inverterPv1Voltage: Math.round((lastRow.inverter_pv1_voltage || 0) * 10) / 10, // Voltage doesn't scale
+      inverterPv1Current: Math.round((lastRow.inverter_pv1_current || 0) * POWER_SCALE / 100) / 10, // Current scales with power
+      inverterPv2Power: Math.round(lastScaled.inverter_pv2_power),
+      inverterPv2Voltage: Math.round((lastRow.inverter_pv2_voltage || 0) * 10) / 10,
+      inverterPv2Current: Math.round((lastRow.inverter_pv2_current || 0) * POWER_SCALE / 100) / 10,
+      inverterKwhToday: Math.round(lastScaled.inverter_kwh_today),
+      inverterKwhTotal: Math.round(lastScaled.inverter_kwh_total),
+      inverterTemp: Math.round((lastRow.inverter_temp || 35) * 10) / 10, // Temp doesn't scale, round to 1 decimal
+      inverterOpState: lastRow.inverter_op_state || 5120,
       inverterAlarmCode: lastRow.inverter_alarm_code || 0,
-      inverterLimitPercent: lastRow.inverter_limit_percent || 0,
-      ambientTemp: lastRow.ambient_temp || 0,
-      meterActivePower: lastRow.meter_active_power || 0,
+      inverterLimitPercent: lastRow.inverter_limit_percent || 100,
+      ambientTemp: Math.round((lastRow.ambient_temp || 30) * 10) / 10, // Round to 1 decimal
+      meterActivePower: Math.round(lastScaled.meter_active_power),
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -196,26 +207,26 @@ async function main() {
     await db.collection("inverters").insertOne(inverterDoc);
     totalInverters++;
 
-    // Telemetry records
-    const teleDocs = telemetryRows.map(r => ({
+    // Telemetry records (SCALED to realistic values)
+    const teleDocs = scaledRows.map((r, i) => ({
       inverterId,
       plantId,
-      timestamp: new Date(r.timestamp),
-      inverterPower: r.inverter_power || 0,
-      inverterPv1Power: r.inverter_pv1_power || 0,
-      inverterPv1Voltage: r.inverter_pv1_voltage || 0,
-      inverterPv1Current: r.inverter_pv1_current || 0,
-      inverterPv2Power: r.inverter_pv2_power || 0,
-      inverterPv2Voltage: r.inverter_pv2_voltage || 0,
-      inverterPv2Current: r.inverter_pv2_current || 0,
-      inverterKwhToday: r.inverter_kwh_today || 0,
-      inverterKwhTotal: r.inverter_kwh_total || 0,
-      inverterTemp: r.inverter_temp || 0,
-      inverterOpState: r.inverter_op_state || 0,
-      inverterAlarmCode: r.inverter_alarm_code || 0,
-      inverterLimitPercent: r.inverter_limit_percent || 0,
-      ambientTemp: r.ambient_temp || 0,
-      meterActivePower: r.meter_active_power || 0,
+      timestamp: new Date(telemetryRows[i].timestamp),
+      inverterPower: Math.round(r.inverter_power),
+      inverterPv1Power: Math.round(r.inverter_pv1_power),
+      inverterPv1Voltage: Math.round((telemetryRows[i].inverter_pv1_voltage || 0) * 10) / 10,
+      inverterPv1Current: Math.round((telemetryRows[i].inverter_pv1_current || 0) * POWER_SCALE / 100) / 10,
+      inverterPv2Power: Math.round(r.inverter_pv2_power),
+      inverterPv2Voltage: Math.round((telemetryRows[i].inverter_pv2_voltage || 0) * 10) / 10,
+      inverterPv2Current: Math.round((telemetryRows[i].inverter_pv2_current || 0) * POWER_SCALE / 100) / 10,
+      inverterKwhToday: Math.round(r.inverter_kwh_today),
+      inverterKwhTotal: Math.round(r.inverter_kwh_total),
+      inverterTemp: Math.round((telemetryRows[i].inverter_temp || 35) * 10) / 10,
+      inverterOpState: telemetryRows[i].inverter_op_state || 5120,
+      inverterAlarmCode: telemetryRows[i].inverter_alarm_code || 0,
+      inverterLimitPercent: telemetryRows[i].inverter_limit_percent || 100,
+      ambientTemp: Math.round((telemetryRows[i].ambient_temp || 30) * 10) / 10,
+      meterActivePower: Math.round(r.meter_active_power),
       createdAt: new Date(),
     }));
 
