@@ -102,8 +102,12 @@ function computeFallbackRisk(inv: any): FallbackRisk {
     issues.push(`${utilPct.toFixed(1)}% utilization — below expected`);
   }
 
-  // 3. PV string imbalance
-  if (pv1P > 0 && pv2P > 0) {
+  // 3. PV string imbalance (only check if BOTH strings have meaningful data)
+  const hasPv1Data = pv1P > 100; // At least 100W to consider it active
+  const hasPv2Data = pv2P > 100;
+  
+  if (hasPv1Data && hasPv2Data) {
+    // Both strings active - check for imbalance
     const imbalance = Math.abs(pv1P - pv2P) / Math.max(pv1P, pv2P) * 100;
     if (imbalance > 50) {
       risk += 20;
@@ -112,13 +116,16 @@ function computeFallbackRisk(inv: any): FallbackRisk {
       risk += 10;
       issues.push(`${imbalance.toFixed(0)}% PV string imbalance`);
     }
-  } else if (pv1P === 0 && pv2P > 0) {
-    risk += 20;
-    issues.push("PV1 string offline — zero power");
-  } else if (pv2P === 0 && pv1P > 0) {
+  } else if (hasPv1Data && !hasPv2Data && pv2V > 50) {
+    // PV1 active but PV2 has voltage but no power - string offline
     risk += 15;
     issues.push("PV2 string offline — zero power");
+  } else if (hasPv2Data && !hasPv1Data && pv1V > 50) {
+    // PV2 active but PV1 has voltage but no power - string offline
+    risk += 20;
+    issues.push("PV1 string offline — zero power");
   }
+  // If neither string has data, this might be single-string inverter or night-time - don't flag
 
   // 4. Voltage anomalies
   if (pv1V > 0 && (pv1V < 100 || pv1V > 750)) {
