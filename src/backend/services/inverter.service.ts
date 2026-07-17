@@ -6,6 +6,7 @@
  * Status reasons powered by Groq AI (with ML + rule fallback).
  */
 
+import mongoose from "mongoose";
 import { connectDB } from "@/backend/config";
 import { env } from "@/backend/config/env";
 import { Inverter, User } from "@/backend/models";
@@ -374,7 +375,8 @@ export async function getAllInverters(userId: string): Promise<InverterType[]> {
   // Guard: only query by ownerId if userId is a valid MongoDB ObjectId.
   // Google OAuth IDs (e.g. "114860268041139426929") are NOT ObjectIds and
   // would cause a Mongoose CastError. Fall through to fetch-all in that case.
-  let inverters: ReturnType<typeof Inverter.find> extends Promise<infer T> ? T : never[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let inverters: any[] = [];
   if (mongoose.isValidObjectId(userId)) {
     inverters = await Inverter.find({ ownerId: userId })
       .sort({ inverterId: 1 })
