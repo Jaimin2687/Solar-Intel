@@ -113,7 +113,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, account, user }) {
       if (account?.provider === "google") {
         // First sign-in: account carries the values stashed in signIn()
-        token.dbUserId = (account as Record<string, unknown>).dbUserId as string || token.sub || "";
+        token.dbUserId = (account as Record<string, unknown>).dbUserId as string || "";
         token.role    = (account as Record<string, unknown>).dbRole as string   || "operator";
       }
       if (account?.provider === "dev-login" && user) {
@@ -121,6 +121,26 @@ export const authOptions: NextAuthOptions = {
         token.dbUserId = user.id || "dev-user-001";
         token.role = "admin";
       }
+
+      // Safety net: if dbUserId is missing or not a valid Mongo ObjectId,
+      // look up the user by their Google sub (token.sub) to get the real _id.
+      // This prevents CastErrors downstream in all API routes.
+      const mongoose = await import("mongoose");
+      if (!token.dbUserId || !mongoose.default.isValidObjectId(token.dbUserId as string)) {
+        if (token.sub) {
+          try {
+            await connectDB();
+            const dbUser = await User.findOne({ googleId: token.sub }).lean();
+            if (dbUser) {
+              token.dbUserId = (dbUser as { _id: { toString(): string } })._id.toString();
+              token.role = (dbUser as { role?: string }).role || "operator";
+            }
+          } catch {
+            // Non-fatal — token proceeds without dbUserId
+          }
+        }
+      }
+
       // Subsequent requests: token already has dbUserId + role — no DB hit
       return token;
     },

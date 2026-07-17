@@ -371,9 +371,15 @@ function mapToFrontend(inv: any, mlPred?: MLPrediction, aiReason?: string, fallb
 export async function getAllInverters(userId: string): Promise<InverterType[]> {
   await connectDB();
 
-  let inverters = await Inverter.find({ ownerId: userId })
-    .sort({ inverterId: 1 })
-    .lean();
+  // Guard: only query by ownerId if userId is a valid MongoDB ObjectId.
+  // Google OAuth IDs (e.g. "114860268041139426929") are NOT ObjectIds and
+  // would cause a Mongoose CastError. Fall through to fetch-all in that case.
+  let inverters: ReturnType<typeof Inverter.find> extends Promise<infer T> ? T : never[] = [];
+  if (mongoose.isValidObjectId(userId)) {
+    inverters = await Inverter.find({ ownerId: userId })
+      .sort({ inverterId: 1 })
+      .lean();
+  }
 
   if (inverters.length === 0) {
     inverters = await Inverter.find({}).sort({ inverterId: 1 }).lean();
